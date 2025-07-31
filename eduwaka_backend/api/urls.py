@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import InstitutionViewSet, CourseViewSet, UserProfileViewSet, EligibilityCheckAPIView
+from .views import InstitutionViewSet, CourseViewSet, UserProfileViewSet, EligibilityCheckAPIView, ChatbotAPIView
+from .serializers import RegisterSerializer # Import the serializer for registration
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView # Import JWT views
 from rest_framework.generics import CreateAPIView # For registration view
 from rest_framework.permissions import AllowAny # For registration view
@@ -15,4 +16,11 @@ urlpatterns = [
   # DRF Simple JWT Authentication URLs
   path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
   path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+  # User Registration
+  path('register/', CreateAPIView.as_view(serializer_class=RegisterSerializer, permission_classes=(AllowAny,)), name='register'),
+  
+  # AI Endpoints
+  path('eligibility-check/', EligibilityCheckAPIView.as_view(), name='eligibility-check'),
+  path('chatbot/', ChatbotAPIView.as_view(), name='chatbot'),
 ]

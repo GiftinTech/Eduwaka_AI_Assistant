@@ -36,17 +36,15 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
   date_joined = models.DateTimeField(default=timezone.now)
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
-  # Add other fields here as per your model definition
 
   objects = UserProfileManager()
 
-  USERNAME_FIELD = 'username' # Or 'email' if you use email for login
+  USERNAME_FIELD = 'username' 
   REQUIRED_FIELDS = ['email', 'first_name', 'last_name'] # These fields will be prompted when creating a user
 
   def __str__(self):
     return self.username
 
-  # Add any other methods if needed
   def get_full_name(self):
     return f"{self.first_name} {self.last_name}".strip()
 
