@@ -25,14 +25,20 @@ interface AuthContextType {
   loadingAuth: boolean;
   appError: string;
   handleSignup: (
+    username: string,
     email: string,
     password: string,
+    firstName: string,
+    lastName: string,
   ) => Promise<{ success: boolean; error?: string }>;
   handleLogin: (
-    email: string,
+    username: string,
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   handleLogout: () => Promise<{ success: boolean; error?: string }>;
+  handlePasswordReset: (
+    email: string,
+  ) => Promise<{ success: boolean; message?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,11 +50,10 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<DjangoUser | null>(null);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [appError, setAppError] = useState<string>('');
 
   // Function to decode JWT token to get user info
-  const decodeJwt = (token: string): DjangoUser | null => {
+  const decodeJwt = (token: string): any => {
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -60,17 +65,52 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           })
           .join(''),
       );
-      const decoded = JSON.parse(jsonPayload);
-
-      // Ensure the decoded token has the expected user fields
-      return {
-        id: decoded.user_id, // Assuming 'user_id' from Django Simple JWT payload
-        email: decoded.email || decoded.username, // Try email first, then username
-        username: decoded.username || decoded.email,
-        // Add other fields from your Django UserProfile if available in token payload
-      };
+      return JSON.parse(jsonPayload);
     } catch (error) {
       console.error('Failed to decode JWT token:', error);
+      return null;
+    }
+  };
+
+  // Function to fetch the full user profile from eduwaka_backend
+  const fetchUserProfile = async (accessToken: string) => {
+    try {
+      const response = await fetch(`${DJANGO_API_BASE_URL}profile/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        if (userData.results[0]) {
+          setUser(userData.results[0]);
+          // console.log(
+          //   'AuthContext: Full user profile loaded:',
+          //   userData.results[0],
+          // );
+        } else {
+          console.error('User data from backend is missing a username field.');
+          setUser(null);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        }
+
+        return userData.results[0];
+      } else {
+        console.error('Failed to fetch user profile:', response.statusText);
+        setUser(null);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        return null;
+      }
+    } catch (error) {
+      console.error('Network error fetching user profile:', error);
+      setUser(null);
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       return null;
     }
   };
@@ -80,13 +120,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const loadUserFromToken = async () => {
       const accessToken = localStorage.getItem('access_token');
       if (accessToken) {
-        const decodedUser = decodeJwt(accessToken);
-        if (decodedUser) {
-          setUser(decodedUser);
-          console.log(
-            'AuthContext: User loaded from token:',
-            decodedUser.username,
-          );
+        const decodedToken = decodeJwt(accessToken);
+        if (decodedToken) {
+          // Fetch full user profile using the token
+          await fetchUserProfile(accessToken);
         } else {
           // Token invalid or expired, clear it
           localStorage.removeItem('access_token');
@@ -96,28 +133,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       }
       setLoadingAuth(false);
-      console.log('AuthContext: Initial auth loading complete.');
+      //console.log('AuthContext: Initial auth loading complete.');
     };
 
     loadUserFromToken();
   }, []);
 
   const handleSignup = async (
+    username: string,
     email: string,
     password: string,
+    firstName: string,
+    lastName: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`${DJANGO_API_BASE_URL}register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username: email, password }),
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         // After successful registration, immediately try to log in
-        return handleLogin(email, password);
+        return handleLogin(username, password);
       } else {
         return {
           success: false,
@@ -131,6 +177,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     } catch (error: any) {
       console.error('Signup error:', error);
+      setAppError(error);
       return {
         success: false,
         error: error.message || 'An unexpected error occurred during signup.',
@@ -139,7 +186,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const handleLogin = async (
-    email: string,
+    username: string,
     password: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -147,7 +194,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await fetch(`${DJANGO_API_BASE_URL}auth/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }), // Simple JWT can authenticate by email or username
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
@@ -155,9 +202,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.ok) {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        const decodedUser = decodeJwt(data.access);
-        if (decodedUser) {
-          setUser(decodedUser);
+        const decodedToken = decodeJwt(data.access);
+        if (decodedToken) {
+          // Fetch the full user profile after getting the token
+          await fetchUserProfile(data.access);
           return { success: true };
         } else {
           return {
@@ -190,14 +238,51 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.removeItem('refresh_token');
       setUser(null);
       return { success: true };
-      // If you implement a JWT blacklist on the backend, you'd make a POST request here
-      // e.g., fetch(`${DJANGO_API_BASE_URL}auth/token/blacklist/`, { method: 'POST', ... });
     } catch (error: any) {
       console.error('Logout error:', error);
       return {
         success: false,
         error: error.message || 'An unexpected error occurred during logout.',
       };
+    }
+  };
+
+  const handlePasswordReset = async (
+    email: string,
+  ): Promise<{ success: boolean; message?: string }> => {
+    setLoadingAuth(true);
+    try {
+      const response = await fetch(`${DJANGO_API_BASE_URL}password_reset/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      setLoadingAuth(false);
+
+      if (response.ok) {
+        return {
+          success: true,
+          message:
+            data.message ||
+            'A password reset link has been sent to your email.',
+        };
+      } else {
+        return {
+          success: false,
+          message:
+            data.email?.[0] ||
+            data.detail ||
+            'Password reset failed. Please check your email address.',
+        };
+      }
+    } catch (error: any) {
+      console.error('Error during password reset:', error);
+      setLoadingAuth(false);
+      return { success: false, message: 'Network error. Please try again.' };
     }
   };
 
@@ -208,6 +293,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     handleSignup,
     handleLogin,
     handleLogout,
+    handlePasswordReset,
   };
 
   return (

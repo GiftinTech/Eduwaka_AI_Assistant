@@ -3,8 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import NotFound from './pages/NotFound';
 import { AuthProvider } from './context/AuthContext';
-import AuthForms from './components/AuthForms';
-//import SignupLoginPage from './pages/SignupLoginPage';
+import Signup from './auth/SignupPage';
+import Login from './auth/LoginPage';
+import PasswordReset from './auth/PasswordReset';
 
 const queryClient = new QueryClient();
 
@@ -14,7 +15,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/signup" element={<AuthForms />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/reset-password" element={<PasswordReset />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

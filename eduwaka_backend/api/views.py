@@ -40,7 +40,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = UserProfile.objects.all()
   serializer_class = UserProfileSerializer
-  permission_classes = [permissions.IsAuthenticated]
+  #permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
     # Allow users to only see/edit their own profile

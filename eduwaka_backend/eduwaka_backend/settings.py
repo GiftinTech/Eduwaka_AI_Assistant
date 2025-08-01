@@ -160,10 +160,13 @@ REST_FRAMEWORK = {
 
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", # React frontend's address
-    "http://127.0.0.1:3000",
+    "http://localhost:5173", # React frontend's address
+    "http://127.0.0.1:5173",
     # Prod frontend URL when deployed
 ]
+
+# Allow eduwaka_frontend to send cookies and auth headers
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -178,9 +181,9 @@ CORS_ALLOW_HEADERS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
