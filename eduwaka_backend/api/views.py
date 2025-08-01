@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import google.generativeai as genai
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
@@ -36,11 +36,31 @@ class CourseViewSet(viewsets.ModelViewSet):
   serializer_class = CourseSerializer
   permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+# Get all users
+class UserListViewSet(generics.ListAPIView):
+  queryset = User.objects.all()
+  serializer_class = UserProfileSerializer
+  permission_classes = [permissions.IsAdminUser]
+
+# Delete user
+class AdminDeleteUserViewSet(APIView):
+  serializer_class = UserProfileSerializer
+  permission_classes = [permissions.IsAdminUser]
+
+  def delete(self, request, user_id):
+    try:
+      user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+      return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    user.delete()
+    return Response({"detail": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
 # ViewSet for UserProfile (read/update own profile)
 class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
   queryset = UserProfile.objects.all()
   serializer_class = UserProfileSerializer
-  #permission_classes = [permissions.IsAuthenticated]
+  permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
     # Allow users to only see/edit their own profile

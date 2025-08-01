@@ -191,7 +191,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       // Call Django REST Framework Simple JWT token obtain endpoint
-      const response = await fetch(`${DJANGO_API_BASE_URL}auth/token/`, {
+      const response = await fetch(`${DJANGO_API_BASE_URL}auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
