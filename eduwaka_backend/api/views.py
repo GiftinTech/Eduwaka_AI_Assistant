@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from .models import Institution, Course, UserProfile
-from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer
+from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer, ChangePasswordSerializer
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import json
@@ -41,6 +41,35 @@ class UserListViewSet(generics.ListAPIView):
   queryset = User.objects.all()
   serializer_class = UserProfileSerializer
   permission_classes = [permissions.IsAdminUser]
+
+# Update user
+class UserUpdateViewSet(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  def patch(self, request, user_id):
+    try:
+      user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+      return Response(
+          {"detail": "User not found"},
+          status=status.HTTP_404_NOT_FOUND
+      )
+    
+    # Prevent users from updating others' profiles unless they are admin
+    if request.user != user and not request.user.is_staff:
+      return Response({"detail": "You are not allowed to update this user's profile"}, status=status.HTTP_403_FORBIDDEN)
+
+    # Prevent password update
+    if 'password' in request.data:
+      return Response({"detail": "You cannot update your password here"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    serializer = UserProfileSerializer(user, data=request.data, partial=True)
+
+    if serializer.is_valid():
+      serializer.save()
+      return Response({"detail": "Profile updated successfully!"}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Delete user
 class AdminDeleteUserViewSet(APIView):
@@ -78,6 +107,23 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response(serializer.data)
+
+# Change password view
+class ChangePasswordViewSet(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  def post(self, request):
+    serializer = ChangePasswordSerializer(data=request.data)
+    if serializer.is_valid():
+      user = request.user
+      if not user.check_password(serializer.validated_data['old_password']):
+        return Response({"detail": "Old password is incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+
+      user.set_password(serializer.validated_data['new_password'])
+      user.save()
+      return Response({"detail": "Password changed successfully!"}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EligibilityCheckAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated] # Only authenticated users can use this
