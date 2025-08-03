@@ -2,6 +2,9 @@ from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import Institution, Course, UserProfile
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_str, force_bytes, smart_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 User = get_user_model() # Get current active user
 
@@ -43,6 +46,42 @@ class ChangePasswordSerializer(serializers.Serializer):
       raise serializers.ValidationError({"new_password": "Passwords must be 8 characters long."})
 
     return data
+  
+# Forgot pwd
+class ForgotPasswordSerializer(serializers.Serializer):
+  email = serializers.EmailField()
+
+  def validate_email(self, value):
+    if not User.objects.filter(email=value).exists():
+      raise serializers.ValidationError("No user is associated with this email.")
+    return value
+  
+# Reset pwd
+class ResetPasswordSerializer(serializers.Serializer):
+  uidb64 = serializers.CharField()
+  token = serializers.CharField()
+  new_password = serializers.CharField(write_only=True)
+  confirm_password = serializers.CharField(write_only=True)
+
+  def validate(self, data):
+    if data['new_password'] != data['confirm_password']:
+      raise serializers.ValidationError("Passwords do not match.")
+    return data
+
+  def save(self):
+    try:
+      uid = force_str(urlsafe_base64_decode(self.validated_data['uidb64']))
+      user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+      raise serializers.ValidationError("Invalid token or user")
+
+    if not default_token_generator.check_token(user, self.validated_data['token']):
+      raise serializers.ValidationError("Token is invalid or expired")
+
+    print("Password reset success for user:", user.username)
+    user.set_password(self.validated_data['new_password'])
+    user.save()
+    return user
 
 class CourseSerializer(serializers.ModelSerializer):
   institution_name = serializers.CharField(source='institution.name', read_only=True)

@@ -190,3 +190,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Forgot pwd and Reset pwd Email config
+
+DEFAULT_FROM_EMAIL = 'Eduwaka <noreply@eduwaka.com>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # use SMTP in production
+
+EDUWAKA_FRONTEND_URL = 'http://localhost:5173/'  
+
+# For prod email sending, use the following instead:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.yourmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'you@yourmail.com'
+# EMAIL_HOST_PASSWORD = 'yourpassword'
+# EMAIL_USE_TLS = True

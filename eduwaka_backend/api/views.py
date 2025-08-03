@@ -1,14 +1,19 @@
 from django.shortcuts import render
 import google.generativeai as genai
 from rest_framework import viewsets, permissions, status, generics
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from .models import Institution, Course, UserProfile
-from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer, ChangePasswordSerializer
+from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import json
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
 
 User = get_user_model()
 
@@ -122,6 +127,44 @@ class ChangePasswordViewSet(APIView):
       user.set_password(serializer.validated_data['new_password'])
       user.save()
       return Response({"detail": "Password changed successfully!"}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
+# Forgot pwd view
+class ForgotPasswordViewSet(APIView):
+  permission_classes = [AllowAny] 
+  def post(self, request):
+    serializer = ForgotPasswordSerializer(data=request.data)
+    if serializer.is_valid():
+      email = serializer.validated_data['email']
+      user = User.objects.get(email=email)
+      uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+      token = default_token_generator.make_token(user)
+      reset_link = f"{settings.EDUWAKA_FRONTEND_URL}/reset-password/{uidb64}/{token}"
+
+      # Send reset email
+      send_mail(
+        subject="Reset your password",
+        message=f"Click the link to reset your password: {reset_link}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+      )
+
+      # Don't send uid and token in prod, just for testing
+      return Response({"detail": "Password reset link sent!", "uidb64": uidb64, "token": token}, status=status.HTTP_200_OK) 
+      # return Response({"detail": "Password reset link sent!"}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
+# Reser pwd view
+class ResetPasswordViewSet(APIView):
+  permission_classes = [AllowAny] 
+
+  def post(self, request):
+    serializer = ResetPasswordSerializer(data=request.data)
+    if serializer.is_valid():
+      serializer.save()
+      return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

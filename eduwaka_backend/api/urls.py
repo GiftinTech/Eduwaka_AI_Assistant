@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import InstitutionViewSet, CourseViewSet, UserProfileViewSet, EligibilityCheckAPIView, ChatbotAPIView, UserListViewSet, AdminDeleteUserViewSet, UserUpdateViewSet, ChangePasswordViewSet
+from .views import InstitutionViewSet, CourseViewSet, UserProfileViewSet, EligibilityCheckAPIView, ChatbotAPIView, UserListViewSet, AdminDeleteUserViewSet, UserUpdateViewSet, ChangePasswordViewSet, ForgotPasswordViewSet, ResetPasswordViewSet
 from .serializers import RegisterSerializer # Import the serializer for registration
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView # Import JWT views
 from rest_framework.generics import CreateAPIView # For registration view
@@ -31,6 +31,11 @@ urlpatterns = [
 
   # Delete user (Admin)
   path('users/<int:user_id>/delete/', AdminDeleteUserViewSet.as_view(), name='admin-delete-user'),
+
+  # Forgot pwd and reset pwd
+  path('auth/forgot-password/', ForgotPasswordViewSet.as_view(), name='forgot-password'),
+  path('auth/reset-password/', ResetPasswordViewSet.as_view(), name='reset-password'),
+
   
   # AI Endpoints
   path('eligibility-check/', EligibilityCheckAPIView.as_view(), name='eligibility-check'),
