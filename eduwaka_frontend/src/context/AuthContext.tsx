@@ -36,8 +36,14 @@ interface AuthContextType {
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   handleLogout: () => Promise<{ success: boolean; error?: string }>;
-  handlePasswordReset: (
+  handleForgotPassword: (
     email: string,
+  ) => Promise<{ success: boolean; message?: string }>;
+  handlePasswordReset: (
+    uidb64: string,
+    token: string,
+    new_password: string,
+    confirm_password: string,
   ) => Promise<{ success: boolean; message?: string }>;
 }
 
@@ -247,7 +253,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const handlePasswordReset = async (
+  const handleForgotPassword = async (
     email: string,
   ): Promise<{ success: boolean; message?: string }> => {
     setLoadingAuth(true);
@@ -283,6 +289,54 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         };
       }
     } catch (error: any) {
+      console.error('Error sending email:', error);
+      setLoadingAuth(false);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  };
+
+  const handlePasswordReset = async (
+    uidb64: string,
+    token: string,
+    new_password: string,
+    confirm_password: string,
+  ): Promise<{ success: boolean; message?: string }> => {
+    setLoadingAuth(true);
+    try {
+      const response = await fetch(
+        `${DJANGO_API_BASE_URL}auth/reset-password/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            uidb64,
+            token,
+            new_password,
+            confirm_password,
+          }),
+        },
+      );
+
+      const data = await response.json();
+      setLoadingAuth(false);
+
+      if (response.ok) {
+        return {
+          success: true,
+          message: data.message || 'Password reset succesfull.',
+        };
+      } else {
+        return {
+          success: false,
+          message:
+            data.email?.[0] ||
+            data.detail ||
+            'Password reset failed. Token expired, please try again.',
+        };
+      }
+    } catch (error: any) {
       console.error('Error during password reset:', error);
       setLoadingAuth(false);
       return { success: false, message: 'Network error. Please try again.' };
@@ -296,6 +350,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     handleSignup,
     handleLogin,
     handleLogout,
+    handleForgotPassword,
     handlePasswordReset,
   };
 

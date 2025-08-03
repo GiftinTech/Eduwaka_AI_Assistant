@@ -140,7 +140,7 @@ class ForgotPasswordViewSet(APIView):
       user = User.objects.get(email=email)
       uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
       token = default_token_generator.make_token(user)
-      reset_link = f"{settings.EDUWAKA_FRONTEND_URL}/reset-password/{uidb64}/{token}"
+      reset_link = f"{settings.EDUWAKA_FRONTEND_URL}reset-password/{uidb64}/{token}"
 
       # Send reset email
       send_mail(

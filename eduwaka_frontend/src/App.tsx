@@ -5,7 +5,8 @@ import NotFound from './pages/NotFound';
 import { AuthProvider } from './context/AuthContext';
 import Signup from './auth/SignupPage';
 import Login from './auth/LoginPage';
-import PasswordReset from './auth/PasswordReset';
+import ForgotPassword from './auth/ForgotPassword';
+import ResetPassword from './auth/ResetPassword';
 
 const queryClient = new QueryClient();
 
@@ -17,7 +18,11 @@ const App = () => (
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/reset-password" element={<PasswordReset />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/reset-password/:uidb64/:token"
+            element={<ResetPassword />}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

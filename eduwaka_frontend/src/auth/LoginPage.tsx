@@ -114,7 +114,7 @@ const Login = () => {
           <Button
             variant="link"
             type="button"
-            onClick={() => navigate('/reset-password')}
+            onClick={() => navigate('/forgot-password')}
             disabled={isSubmitting || loadingAuth}
           >
             Forgot password?

@@ -5,9 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import Button from '../components/ui/button';
 
-const PasswordReset = () => {
+const ForgotPassword = () => {
   // Access auth functions and state from the context
-  const { handlePasswordReset, loadingAuth, user } = useAuth();
+  const { handleForgotPassword, loadingAuth, user } = useAuth();
 
   // State for the password reset form
   const [resetEmail, setResetEmail] = useState<string>('');
@@ -26,13 +26,13 @@ const PasswordReset = () => {
   }, [user, navigate]);
 
   // Handle password reset form submission
-  const handlePasswordResetSubmit = async (e: FormEvent) => {
+  const handleForgotPasswordSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setResetMessage('');
     setFormAuthError('');
 
-    const result = await handlePasswordReset(resetEmail);
+    const result = await handleForgotPassword(resetEmail);
 
     if (result.success) {
       setResetMessage(
@@ -68,7 +68,7 @@ const PasswordReset = () => {
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Reset Your Password
         </p>
-        <form onSubmit={handlePasswordResetSubmit} className="space-y-6">
+        <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
           <p className="mb-4 text-center text-gray-600 dark:text-gray-300">
             Enter your email to receive a password reset link.
           </p>
@@ -127,4 +127,4 @@ const PasswordReset = () => {
   );
 };
 
-export default PasswordReset;
+export default ForgotPassword;
