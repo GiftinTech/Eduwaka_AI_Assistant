@@ -252,13 +252,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ): Promise<{ success: boolean; message?: string }> => {
     setLoadingAuth(true);
     try {
-      const response = await fetch(`${DJANGO_API_BASE_URL}password_reset/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${DJANGO_API_BASE_URL}auth/forgot-password/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
         },
-        body: JSON.stringify({ email }),
-      });
+      );
 
       const data = await response.json();
       setLoadingAuth(false);
