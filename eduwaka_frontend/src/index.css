@@ -136,3 +136,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbar but still allow scroll */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.custom-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}

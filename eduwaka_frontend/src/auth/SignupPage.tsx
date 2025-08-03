@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Button from '../components/ui/button';
 
 const Signup = () => {
   // Access auth functions and state from the context
@@ -60,17 +61,18 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4 font-sans">
-      <div className="relative w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 hover:scale-[1.02] dark:bg-gray-800">
-        <button
+    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4 py-5">
+      <div className="relative w-full rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800 sm:max-w-lg">
+        <Button
+          variant="outline"
           onClick={() => navigate('/')}
-          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400"
           aria-label="Back to Landing Page"
         >
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
-        </button>
-        <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-purple-600 dark:text-purple-400">Waka</span>
+        </Button>
+        <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
+          Edu<span className="text-indigo-600 dark:text-indigo-400">Waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Create your EduWaka account
@@ -86,8 +88,8 @@ const Signup = () => {
             <input
               type="text"
               id="username"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-              placeholder="Your unique username"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              placeholder="Your username"
               value={username}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setUsername(e.target.value)
@@ -106,7 +108,7 @@ const Signup = () => {
             <input
               type="email"
               id="email"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               placeholder="you@example.com"
               value={email}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -127,7 +129,7 @@ const Signup = () => {
               <input
                 type="text"
                 id="firstName"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
                 placeholder="John"
                 value={firstName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -147,7 +149,7 @@ const Signup = () => {
               <input
                 type="text"
                 id="lastName"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
                 placeholder="Doe"
                 value={lastName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -168,7 +170,7 @@ const Signup = () => {
             <input
               type="password"
               id="password"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               placeholder="••••••••"
               value={password}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -188,7 +190,7 @@ const Signup = () => {
             <input
               type="password"
               id="confirmPassword"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -205,7 +207,7 @@ const Signup = () => {
           )}
           <button
             type="submit"
-            className="w-full transform rounded-lg bg-blue-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-400"
+            className="w-full transform rounded-lg bg-indigo-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-400"
             disabled={isSubmitting || loadingAuth}
           >
             {isSubmitting || loadingAuth ? 'Processing...' : 'Sign Up'}
@@ -216,7 +218,7 @@ const Signup = () => {
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="font-medium text-blue-600 transition-colors hover:text-blue-800 focus:outline-none dark:text-blue-400 dark:hover:text-blue-600"
+            className="font-medium text-indigo-600 transition-colors hover:text-indigo-800 focus:outline-none dark:text-indigo-400 dark:hover:text-indigo-600"
             disabled={isSubmitting || loadingAuth}
           >
             Login

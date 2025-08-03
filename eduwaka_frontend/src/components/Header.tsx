@@ -57,7 +57,7 @@ const Header = () => {
                 <Button
                   variant="hero"
                   className="font-semibold"
-                  onClick={() => navigate('/account')}
+                  onClick={() => navigate('/dashboard')}
                 >
                   <User className="mr-2 h-4 w-4" />
                   {user.username || 'User'} Profile
@@ -127,7 +127,7 @@ const Header = () => {
                       variant="hero"
                       className="mt-4 w-full font-semibold"
                       onClick={() => {
-                        navigate('/account');
+                        navigate('/dashboard');
                         setIsMenuOpen(false);
                       }}
                     >

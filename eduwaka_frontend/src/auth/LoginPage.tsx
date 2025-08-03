@@ -41,17 +41,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4 font-sans">
-      <div className="relative w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 hover:scale-[1.02] dark:bg-gray-800">
-        <button
+    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
+      <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800">
+        <Button
+          variant="outline"
           onClick={() => navigate('/')}
-          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400"
           aria-label="Back to Landing Page"
         >
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
-        </button>
-        <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-purple-600 dark:text-purple-400">Waka</span>
+        </Button>
+        <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
+          Edu<span className="text-indigo-600 dark:text-indigo-400">Waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Sign in to your account
@@ -67,7 +68,7 @@ const Login = () => {
             <input
               type="text"
               id="username"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               placeholder="Your username"
               value={username}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -87,7 +88,7 @@ const Login = () => {
             <input
               type="password"
               id="password"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
+              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
               placeholder="••••••••"
               value={password}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -104,7 +105,7 @@ const Login = () => {
           )}
           <button
             type="submit"
-            className="w-full transform rounded-lg bg-blue-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-400"
+            className="w-full transform rounded-lg bg-indigo-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-400"
             disabled={isSubmitting || loadingAuth}
           >
             {isSubmitting || loadingAuth ? 'Processing...' : 'Login'}

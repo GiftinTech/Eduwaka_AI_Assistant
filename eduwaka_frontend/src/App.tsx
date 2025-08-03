@@ -7,6 +7,8 @@ import Signup from './auth/SignupPage';
 import Login from './auth/LoginPage';
 import ForgotPassword from './auth/ForgotPassword';
 import ResetPassword from './auth/ResetPassword';
+import DashboardContent from './components/DashboardContent';
+import DashboardLayout from './components/DashboardLayout';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,15 @@ const App = () => (
             path="/reset-password/:uidb64/:token"
             element={<ResetPassword />}
           />
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardContent />} />
+            {/* <Route path="/searchInstitutions" element={<SearchInstitutions />} />
+            <Route
+              path="/eligibilityCheckerAI"
+              element={<EligibilityChecker />}
+            /> */}
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

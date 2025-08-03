@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 // Base URL for Django eduwaka_backend API
-const DJANGO_API_BASE_URL = 'http://127.0.0.1:8000/api/';
+const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
 // Shape of the Django User object
 interface DjangoUser {

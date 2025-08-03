@@ -49,6 +49,16 @@ module.exports = {
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-card': 'var(--gradient-card)',
       },
+      keyframes: {
+        swirl: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+      },
+      animation: {
+        swirl: 'swirl 8s ease infinite',
+      },
     },
   },
   plugins: [],

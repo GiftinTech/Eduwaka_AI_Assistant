@@ -21,7 +21,6 @@ const ResetPassword = () => {
   // Hook for navigation
   const navigate = useNavigate();
 
-  // If a user is already logged in, navigate them away from this page
   useEffect(() => {
     // Ensure token and uid are present
     if (!uidb64 || !token) {
@@ -36,6 +35,12 @@ const ResetPassword = () => {
     setSuccessMessage('');
     setIsSubmitting(true);
 
+    if (newPassword !== confirmPassword) {
+      setFormAuthError('Passwords do not match.');
+      setIsSubmitting(false);
+      return;
+    }
+
     const result = await handlePasswordReset(
       uidb64!,
       token!,
@@ -49,18 +54,21 @@ const ResetPassword = () => {
       setSuccessMessage(result.message || 'Password reset successful!');
       setNewPassword('');
       setConfirmPassword('');
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 2000);
     } else {
       setFormAuthError(result.message || 'Something went wrong. Try again.');
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 px-4">
+    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl dark:bg-gray-800">
-        <h2 className="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Reset Your Password
+        <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
+          Edu<span className="text-purple-600 dark:text-purple-400">Waka</span>
         </h2>
+        <p className="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Reset Your Password
+        </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
@@ -72,6 +80,7 @@ const ResetPassword = () => {
             <input
               type="password"
               id="newPassword"
+              placeholder="Enter new password"
               className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               value={newPassword}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -91,6 +100,7 @@ const ResetPassword = () => {
             <input
               type="password"
               id="confirmPassword"
+              placeholder="Confirm new password"
               className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               value={confirmPassword}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
