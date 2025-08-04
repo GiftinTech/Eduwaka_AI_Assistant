@@ -21,7 +21,7 @@ const DashboardCard = ({
     onClick={onClick}
     className="block w-full transform rounded-lg bg-white p-6 text-left shadow-md transition-shadow duration-300 hover:-translate-y-1 hover:shadow-xl"
   >
-    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
       {icon}
     </div>
     <h4 className="mb-2 text-xl font-semibold text-gray-900">{title}</h4>
@@ -97,7 +97,7 @@ const DashboardContent = () => {
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        Welcome to EduWaka!
+        Welcome to Edu<span className="text-indigo-700">Waka!</span>
       </h2>
       <p className="mb-8 text-lg text-gray-700">
         Your personalized guide to university admissions in Nigeria.
@@ -123,9 +123,9 @@ const DashboardContent = () => {
         />
       </div>
 
-      <div className="mt-8 rounded-lg bg-blue-50 p-6 shadow-inner">
+      <div className="mt-8 rounded-lg bg-indigo-50 p-6 shadow-inner">
         <div className="flex justify-between">
-          <h3 className="mb-4 text-xl font-semibold text-blue-800">
+          <h3 className="mb-4 text-xl font-semibold text-indigo-800">
             Your Profile Summary{' '}
           </h3>
           <div className="group relative inline-block">
@@ -139,7 +139,7 @@ const DashboardContent = () => {
         </div>
 
         {loadingProfile ? (
-          <p className="text-blue-700">Loading profile...</p>
+          <p className="text-indigo-700">Loading profile...</p>
         ) : profileError ? (
           <p className="text-red-600">{profileError}</p>
         ) : profile ? (

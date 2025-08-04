@@ -42,6 +42,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
   USERNAME_FIELD = 'username' 
   REQUIRED_FIELDS = ['email', 'first_name', 'last_name'] # These fields will be prompted when creating a user
 
+  # New fields for soft deletion
+  is_deleted = models.BooleanField(default=False)
+  deleted_at = models.DateTimeField(null=True, blank=True)
+
   def __str__(self):
     return self.username
 

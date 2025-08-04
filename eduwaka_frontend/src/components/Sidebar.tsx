@@ -57,13 +57,13 @@ const SidebarItem = ({ icon, label, onClick, isActive }: SidebarItemProps) => (
     onClick={onClick}
     className={`flex w-full items-center rounded-lg px-4 py-2 transition-colors duration-200 ${
       isActive
-        ? 'bg-blue-100 font-semibold text-blue-700'
+        ? 'bg-indigo-100 font-semibold text-indigo-700'
         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
     }`}
   >
     {icon}
     <span className="ml-3">{label}</span>
-    {isActive && <ChevronRight size={16} className="ml-auto text-blue-700" />}
+    {isActive && <ChevronRight size={16} className="ml-auto text-indigo-700" />}
   </button>
 );
 
@@ -95,7 +95,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
   return (
     <>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold text-blue-700">EduWaka</h1>
+        <h1 className="text-3xl font-extrabold text-indigo-700">EduWaka</h1>
         <button
           className="text-gray-600 hover:text-gray-900 md:hidden"
           onClick={() => setIsSidebarOpen(false)}

@@ -191,6 +191,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Check for softdelete status in backends.py
+AUTHENTICATION_BACKENDS = [
+    'api.backends.SoftDeleteAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Forgot pwd and Reset pwd Email config
 PASSWORD_RESET_TIMEOUT = 60 * 10  # Valid for 10 minutes
 

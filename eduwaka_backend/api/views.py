@@ -1,25 +1,85 @@
 from django.shortcuts import render
 import google.generativeai as genai
 from rest_framework import viewsets, permissions, status, generics
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from .models import Institution, Course, UserProfile
-from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
-from django.contrib.auth import get_user_model
+from .serializers import InstitutionSerializer, CourseSerializer, UserProfileSerializer, ChangePasswordSerializer, ForgotPasswordSerializer, ResetPasswordSerializer, LoginSerializer
+from django.contrib.auth import get_user_model, authenticate, login
 from django.conf import settings
 import json
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+from django.utils import timezone
+from datetime import timedelta
 
 User = get_user_model()
 
 # Configure Gemini API with the key from settings
 genai.configure(api_key=settings.GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.5-flash") 
+
+# LoginViewSet
+class LoginViewSet(APIView):
+  permission_classes = [AllowAny]
+  serializer_class = LoginSerializer
+
+  def post(self, request, *args, **kwargs):
+    serializer = self.serializer_class(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    username = serializer.validated_data['username']
+    password = serializer.validated_data['password']
+
+    try:
+      user = User.objects.get(username=username)
+    except User.DoesNotExist:
+      return Response(
+          {"detail": "Invalid username or password."},
+          status=status.HTTP_401_UNAUTHORIZED
+      )
+    
+    # Soft-delete logic
+    if user.is_deleted:
+      deletion_time = user.deleted_at
+      thirty_days_ago = timezone.now() - timedelta(days=30)
+      
+      if deletion_time >= thirty_days_ago:
+        if user.check_password(password):
+          # Reactivate the account before generating tokens
+          user.is_deleted = False
+          user.deleted_at = None
+          user.save()
+          
+          # Get tokens using the Simple JWT serializer
+          jwt_serializer = TokenObtainPairSerializer(data=request.data)
+          jwt_serializer.is_valid(raise_exception=True)
+          
+          response_data = jwt_serializer.validated_data
+          response_data["detail"] = "Account recovered and logged in successfully."
+          return Response(response_data, status=status.HTTP_200_OK)
+      else:
+        return Response(
+            {"detail": "This account is permanently deleted. Please create a new one."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Standard login for non-deleted accounts
+    if user.check_password(password):
+      jwt_serializer = TokenObtainPairSerializer(data=request.data)
+      jwt_serializer.is_valid(raise_exception=True)
+      return Response(jwt_serializer.validated_data, status=status.HTTP_200_OK)
+    
+    return Response(
+      {"detail": "Invalid username or password."},
+      status=status.HTTP_401_UNAUTHORIZED
+    )
 
 # ViewSet for Institution model
 class InstitutionViewSet(viewsets.ModelViewSet):
@@ -41,13 +101,13 @@ class CourseViewSet(viewsets.ModelViewSet):
   serializer_class = CourseSerializer
   permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-# Get all users
+# Get all users - Admin
 class UserListViewSet(generics.ListAPIView):
   queryset = User.objects.all()
   serializer_class = UserProfileSerializer
   permission_classes = [permissions.IsAdminUser]
 
-# Update user
+# Update user - Admin
 class UserUpdateViewSet(APIView):
   permission_classes = [permissions.IsAuthenticated]
 
@@ -76,8 +136,8 @@ class UserUpdateViewSet(APIView):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Delete user
-class AdminDeleteUserViewSet(APIView):
+# Delete user Admin
+class DeleteUserViewSet(APIView):
   serializer_class = UserProfileSerializer
   permission_classes = [permissions.IsAdminUser]
 
@@ -102,18 +162,32 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
       return UserProfile.objects.filter(id=self.request.user.id)
     return UserProfile.objects.none()
 
-  @action(detail=False, methods=['get', 'put'])
+  @action(detail=False, methods=['get', 'put', 'patch', 'delete'])
   def me(self, request):
     if request.method == 'GET':
       serializer = self.get_serializer(request.user)
       return Response(serializer.data)
-    elif request.method == 'PUT':
+    
+    elif request.method in ['PUT', 'PATCH']:
       serializer = self.get_serializer(request.user, data=request.data, partial=True)
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response(serializer.data)
+    
+    elif request.method == 'DELETE':
+      user_to_delete = request.user
+      user_profile = user_to_delete.profile
+      
+      user_profile.is_deleted = True
+      user_profile.deleted_at = timezone.now()
+      user_profile.save()
+      
+      return Response(
+          {"detail": "Your account has been deactivated. You can recover it within 30 days by logging in again."},
+          status=status.HTTP_200_OK
+      )
 
-# Change password view
+# Change password view - auth/change-password
 class ChangePasswordViewSet(APIView):
   permission_classes = [permissions.IsAuthenticated]
 

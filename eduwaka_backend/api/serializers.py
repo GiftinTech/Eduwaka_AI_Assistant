@@ -8,6 +8,11 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 User = get_user_model() # Get current active user
 
+# Login Serializer
+class LoginSerializer(serializers.Serializer):
+  username = serializers.CharField(required=True)
+  password = serializers.CharField(required=True, style={'input_type': 'password'})
+
 # Serializer for User Registration
 class RegisterSerializer(serializers.ModelSerializer):
   password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
