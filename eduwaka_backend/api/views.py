@@ -176,12 +176,11 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     
     elif request.method == 'DELETE':
       user_to_delete = request.user
-      user_profile = user_to_delete.profile
       
-      user_profile.is_deleted = True
-      user_profile.deleted_at = timezone.now()
-      user_profile.save()
-      
+      user_to_delete.is_deleted = True
+      user_to_delete.deleted_at = timezone.now()
+      user_to_delete.save()
+
       return Response(
           {"detail": "Your account has been deactivated. You can recover it within 30 days by logging in again."},
           status=status.HTTP_200_OK

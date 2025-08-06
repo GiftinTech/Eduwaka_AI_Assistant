@@ -1,8 +1,8 @@
 import { useEffect, useState, type JSX } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { BookOpen, EditIcon, ListChecks, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Button from './ui/button';
+import Button from '../ui/button';
 
 interface DashboardCardProps {
   title: string;
@@ -64,7 +64,7 @@ const DashboardContent = () => {
       }
 
       try {
-        const response = await fetch(`${DJANGO_API_BASE_URL}profile/`, {
+        const response = await fetch(`${DJANGO_API_BASE_URL}profile/me`, {
           // Endpoint for current user's profile
           method: 'GET',
           headers: {

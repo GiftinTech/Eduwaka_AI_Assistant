@@ -1,6 +1,6 @@
-import type { JSX } from 'react';
+import { useEffect, type JSX } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   Search,
   BookOpen,
@@ -10,7 +10,6 @@ import {
   Mail,
   LifeBuoy,
   Bot,
-  User,
   LogOut,
   Home,
   HelpCircle,
@@ -78,6 +77,17 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
 
   const currentPath = location.pathname;
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!document.getElementById('sidebar')?.contains(e.target as Node)) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [setIsSidebarOpen]);
+
   const onLogoutClick = async () => {
     const result = await handleLogout();
     if (result.success) {
@@ -93,7 +103,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
     (currentPath === '/dashboard' && path === '');
 
   return (
-    <>
+    <div id="sidebar">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-extrabold text-indigo-700">EduWaka</h1>
         <button
@@ -167,13 +177,13 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
           />
           <SidebarItem
             icon={<HelpCircle size={20} />}
-            label="FAQ Section"
+            label="FAQ"
             onClick={() => navigate('/dashboard/faqSection')}
             isActive={isActive('faqSection')}
           />
           <SidebarItem
             icon={<LifeBuoy size={20} />}
-            label="Support/Help Desk"
+            label="Support/Ask for Help"
             onClick={() => navigate('/dashboard/supportHelpDesk')}
             isActive={isActive('supportHelpDesk')}
           />
@@ -182,12 +192,6 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
             label="Chatbot"
             onClick={() => navigate('/dashboard/chatbot')}
             isActive={isActive('chatbot')}
-          />
-          <SidebarItem
-            icon={<User size={20} />}
-            label="My Profile"
-            onClick={() => navigate('/dashboard/myProfile')}
-            isActive={isActive('myProfile')}
           />
         </nav>
       </div>
@@ -201,7 +205,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
           <span className="font-medium">Logout</span>
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
