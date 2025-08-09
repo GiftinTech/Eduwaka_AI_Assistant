@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="200" viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">Eduwaka logo preview</title>
+
+  <!-- Background (transparent) -->
+  <rect width="100%" height="100%" fill="transparent"/>
+
+  <!-- Rounded speech-bubble / bookmark icon on the left -->
+  <g transform="translate(40,30)">
+    <rect x="0" y="0" rx="24" ry="24" width="140" height="140" fill="hsl(192,100%,9%)"/>
+    <circle cx="70" cy="50" r="28" fill="hsl(322,100%,66%)" />
+    <!-- small white highlight -->
+    <ellipse cx="82" cy="40" rx="8" ry="5" fill="rgba(255,255,255,0.35)"/>
+    <!-- tail -->
+    <path d="M60 140 L80 120 L100 140 Z" fill="hsl(192,100%,9%)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(220,125)">
+    <!-- 'Edu' in cyan-ish, 'waka' in pink-ish -->
+    <text x="0" y="8" font-family="Poppins, Arial, sans-serif" font-weight="700" font-size="56" fill="hsl(207,100%,98%)">
+      <tspan x="0" y="0" fill="hsl(207,100%,98%)">Edu</tspan>
+      <tspan x="110" y="0" fill="hsl(322,100%,66%)">waka</tspan>
+    </text>
+    <!-- small tagline -->
+    <text x="0" y="40" font-family="Open Sans, Arial, sans-serif" font-weight="600" font-size="14" fill="rgba(255,255,255,0.7)">
+      Simplifying university admissions
+    </text>
+  </g>
+</svg>

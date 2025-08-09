@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ['class'],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -55,9 +55,27 @@ module.exports = {
           '50%': { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0% 50%' },
         },
+        'scroll-right': {
+          '0%': { transform: 'translateX(calc(-50% + 2rem))' },
+          '100%': { transform: 'translateX(0%)' },
+        },
+        'scroll-left': {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(calc(-50% + 2rem))' },
+        },
+        'slide-in-dynamic-x': {
+          '0%': {
+            transform: 'translateX(var(--tw-slide-from-x, -100%))',
+            opacity: '0',
+          },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
       },
       animation: {
         swirl: 'swirl 8s ease infinite',
+        'scroll-right': 'scroll-right 20s linear infinite',
+        'scroll-left': 'scroll-left 20s linear infinite',
+        'slide-in-dynamic-x': 'slide-in-dynamic-x 0.8s ease-out forwards',
       },
     },
   },

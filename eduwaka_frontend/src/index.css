@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* Educational Blue Theme */
-    --background: 250 100% 99%;
+    --background: 0 0% 100%;
     --foreground: 215 25% 27%;
 
     --card: 0 0% 100%;
@@ -86,10 +86,14 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Images */
+    --mobile-bg: url('./assets/bg-footer-top-mobile.svg');
+    --desktop-bg: url('./assets/bg-footer-top-desktop.svg');
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 220 100% 3%; /* Adjusted for a darker, consistent base in dark mode */
     --foreground: 210 40% 98%;
 
     --card: 222.2 84% 4.9%;
@@ -124,6 +128,9 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --mobile-bg: url('./assets/bg-footer-top-mobile.svg');
+    --desktop-bg: url('./assets/bg-footer-top-desktop.svg');
   }
 }
 
