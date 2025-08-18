@@ -17,6 +17,7 @@ interface DjangoUser {
   username: string;
   first_name?: string;
   last_name?: string;
+  photo?: string;
 }
 
 // Shape of the AuthContext value

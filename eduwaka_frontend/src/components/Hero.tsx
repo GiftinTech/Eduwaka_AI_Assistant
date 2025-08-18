@@ -48,9 +48,8 @@ const Hero = () => {
             <div
               className={`mb-6 transition-all duration-1000 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
             >
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm font-medium">
                 {' '}
-                {/* Changed text color for visibility */}
                 <Bot className="mr-2 h-4 w-4" />
                 AI-Powered University Admission Guide
               </span>
@@ -68,7 +67,7 @@ const Hero = () => {
             </h1>
 
             <p
-              className={`delay-400 mb-8 max-w-2xl text-xl text-gray-700 transition-all duration-1000 dark:text-gray-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`delay-400 text-md mb-8 max-w-2xl italic text-gray-700 transition-all duration-1000 dark:text-gray-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
             >
               EduWaka helps Nigerian students navigate university admissions
               with intelligent tools for institution search, course eligibility,
@@ -76,7 +75,7 @@ const Hero = () => {
             </p>
 
             <div
-              className={`delay-600 mb-8 flex flex-col justify-center gap-4 transition-all duration-1000 sm:flex-row lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`delay-600 mb-8 flex flex-row justify-center gap-4 transition-all duration-1000 lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
             >
               <Button
                 size="lg"
@@ -89,7 +88,7 @@ const Hero = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary-500 text-primary-500 dark:border-primary-300 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900 bg-transparent px-8 py-4 text-lg transition-all duration-200 hover:scale-105" // Adjusted for white background
+                className="border-primary-500 text-primary-500 dark:border-primary-300 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900 border bg-transparent px-8 py-4 text-lg transition-all duration-200 hover:scale-105"
               >
                 <CheckCircle className="mr-2 h-5 w-5" />
                 Check Eligibility

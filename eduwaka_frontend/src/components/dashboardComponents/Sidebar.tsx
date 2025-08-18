@@ -16,6 +16,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react';
+import { useAlert } from '../../hooks/useAlert';
 
 const NairaIcon = ({
   size = 24,
@@ -72,6 +73,8 @@ interface SidebarProps {
 
 const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
   const { handleLogout } = useAuth();
+  const { showAlert } = useAlert();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -92,6 +95,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
     const result = await handleLogout();
     if (result.success) {
       navigate('/');
+      showAlert('success', 'Successfully logged out.', 5);
     } else {
       console.error('Logout failed:', result.error);
     }
@@ -107,7 +111,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-3xl font-extrabold">
           {' '}
-          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
+          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
         </h1>
         <button
           className="text-gray-600 hover:text-gray-900 md:hidden"

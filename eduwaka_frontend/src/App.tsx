@@ -23,6 +23,8 @@ import EmailNotifications from './components/dashboardComponents/EmailNotificati
 import FAQSection from './components/dashboardComponents/FAQSection';
 import SupportHelpDesk from './components/dashboardComponents/SupportHelpDest';
 import Chatbot from './components/dashboardComponents/Chatbot';
+import { AlertProvider } from './context/AlertContext';
+import AlertContainer from './utils/alert';
 
 const queryClient = new QueryClient();
 
@@ -30,72 +32,71 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/reset-password/:uidb64/:token"
-            element={<ResetPassword />}
-          />
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardContent />} />
-            <Route path="/dashboard/myProfile" element={<UserProfile />} />
+        <AlertProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route
-              path="/dashboard/eligibilityCheckerAI"
-              element={<EligibilityCheckerAI />}
+              path="/reset-password/:uidb64/:token"
+              element={<ResetPassword />}
             />
-            <Route
-              path="/dashboard/searchCourses"
-              element={<SearchCourses />}
-            />
-            <Route
-              path="/dashboard/courseDetails"
-              element={<CourseDetails />}
-            />
-            <Route
-              path="/dashboard/eligibilityCheckerAI"
-              element={<EligibilityCheckerAI />}
-            />
-            <Route
-              path="/dashboard/searchInstitutions"
-              element={<SearchInstitutions />}
-            />
-            <Route
-              path="/dashboard/tuitionChecker"
-              element={<TuitionFeeChecker />}
-            />
-            <Route
-              path="/dashboard/olevelCombination"
-              element={<OLevelCombinationChecker />}
-            />
-            <Route
-              path="/dashboard/jambCombination"
-              element={<JAMBCombinationChecker />}
-            />
-            <Route
-              path="/dashboard/institutionOverview"
-              element={<InstitutionOverview />}
-            />
-            <Route
-              path="/dashboard/admissionCalendar"
-              element={<UniversityAdmissionCalendar />}
-            />
-            <Route
-              path="/dashboard/emailNotifications"
-              element={<EmailNotifications />}
-            />
-            <Route path="/dashboard/faqSection" element={<FAQSection />} />
-            <Route
-              path="/dashboard/supportHelpDesk"
-              element={<SupportHelpDesk />}
-            />
-            <Route path="/dashboard/chatbot" element={<Chatbot />} />
-          </Route>
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardContent />} />
+              <Route path="/dashboard/myProfile" element={<UserProfile />} />
+              <Route
+                path="/dashboard/eligibilityCheckerAI"
+                element={<EligibilityCheckerAI />}
+              />
+              <Route
+                path="/dashboard/searchCourses"
+                element={<SearchCourses />}
+              />
+              <Route
+                path="/dashboard/courseDetails"
+                element={<CourseDetails />}
+              />
+              <Route
+                path="/dashboard/searchInstitutions"
+                element={<SearchInstitutions />}
+              />
+              <Route
+                path="/dashboard/tuitionChecker"
+                element={<TuitionFeeChecker />}
+              />
+              <Route
+                path="/dashboard/olevelCombination"
+                element={<OLevelCombinationChecker />}
+              />
+              <Route
+                path="/dashboard/jambCombination"
+                element={<JAMBCombinationChecker />}
+              />
+              <Route
+                path="/dashboard/institutionOverview"
+                element={<InstitutionOverview />}
+              />
+              <Route
+                path="/dashboard/admissionCalendar"
+                element={<UniversityAdmissionCalendar />}
+              />
+              <Route
+                path="/dashboard/emailNotifications"
+                element={<EmailNotifications />}
+              />
+              <Route path="/dashboard/faqSection" element={<FAQSection />} />
+              <Route
+                path="/dashboard/supportHelpDesk"
+                element={<SupportHelpDesk />}
+              />
+              <Route path="/dashboard/chatbot" element={<Chatbot />} />
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <AlertContainer />
+        </AlertProvider>
       </BrowserRouter>
     </AuthProvider>
   </QueryClientProvider>

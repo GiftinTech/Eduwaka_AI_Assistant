@@ -63,7 +63,7 @@ const ForgotPassword = () => {
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
         </button>
         <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
+          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Reset Your Password

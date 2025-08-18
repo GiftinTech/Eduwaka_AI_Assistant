@@ -3,10 +3,12 @@ import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/button';
+import { useAlert } from '../hooks/useAlert';
 
 const Login = () => {
   // Access auth functions and state from the context
   const { handleLogin, loadingAuth } = useAuth();
+  const { showAlert } = useAlert();
 
   // State for the form inputs and submission status
   const [username, setUsername] = useState<string>('');
@@ -30,8 +32,9 @@ const Login = () => {
       // Clear form inputs on successful login
       setUsername('');
       setPassword('');
-      // Navigate to the home page
-      navigate('/');
+      // Navigate to the dashboard
+      navigate('/dashboard');
+      showAlert('success', 'Login successful');
     } else {
       // Display the error message from the API
       setFormAuthError(result.error || 'An unknown error occurred.');
@@ -52,7 +55,7 @@ const Login = () => {
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
         </Button>
         <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
+          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Sign in to your account

@@ -1,5 +1,5 @@
-import { useEffect, useState, type JSX } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { type JSX } from 'react';
+
 import { BookOpen, ListChecks, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,8 @@ interface DashboardCardProps {
   onClick?: () => void;
 }
 
+// DashboardCard component
+// DashboardCard component
 const DashboardCard = ({
   title,
   description,
@@ -18,81 +20,17 @@ const DashboardCard = ({
 }: DashboardCardProps) => (
   <button
     onClick={onClick}
-    className="block w-full transform rounded-lg bg-white p-6 text-left shadow-md transition-shadow duration-300 hover:-translate-y-1 hover:shadow-xl"
+    className="flex w-full transform flex-col items-center rounded-lg bg-white p-6 text-center shadow-md transition-shadow duration-300 hover:-translate-y-1 hover:shadow-xl"
   >
-    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
       {icon}
     </div>
     <h4 className="mb-2 text-xl font-semibold text-gray-900">{title}</h4>
     <p className="text-sm text-gray-600">{description}</p>
   </button>
 );
-
-// UserProfileData for Django User/UserProfile model
-interface UserProfileData {
-  id: number;
-  username: string;
-  email: string;
-  first_name?: string;
-  last_name?: string;
-}
-
 const DashboardContent = () => {
   const navigate = useNavigate();
-
-  const { user } = useAuth(); // Get user from context
-
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
-  const [profileError, setProfileError] = useState<string>('');
-
-  const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user) {
-        setLoadingProfile(false);
-        setProfileError('User not authenticated.');
-        return;
-      }
-
-      const accessToken = localStorage.getItem('access_token');
-      if (!accessToken) {
-        setLoadingProfile(false);
-        setProfileError('Authentication token missing. Please log in again.');
-        return;
-      }
-
-      try {
-        const response = await fetch(`${DJANGO_API_BASE_URL}profile/me`, {
-          // Endpoint for current user's profile
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch user profile.');
-        }
-
-        const data = await response.json();
-        console.log(data.results[0]);
-        setProfile(data.results[0]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        setProfileError(error.message || 'Failed to load profile data.');
-      } finally {
-        setLoadingProfile(false);
-      }
-    };
-
-    fetchUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]); // Re-fetch if user object changes after login/logout
 
   return (
     <div>
@@ -104,7 +42,7 @@ const DashboardContent = () => {
         Your personalized guide to university admissions in Nigeria.
       </p>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Quick Search"
           description="Find institutions and courses quickly."
@@ -123,49 +61,6 @@ const DashboardContent = () => {
           icon={<BookOpen size={24} />}
         />
       </div>
-
-      <div className="mt-8 rounded-lg bg-indigo-50 p-6 shadow-inner">
-        <div className="flex justify-between">
-          <h3 className="mb-4 text-xl font-semibold text-indigo-800">
-            Your Profile Summary{' '}
-          </h3>
-        </div>
-
-        {loadingProfile ? (
-          <p className="text-indigo-700">Loading profile...</p>
-        ) : profileError ? (
-          <p className="text-red-600">{profileError}</p>
-        ) : profile ? (
-          <>
-            <p className="text-gray-700">
-              <span className="font-medium">Username:</span> {profile.username}
-            </p>
-            <p className="text-gray-700">
-              <span className="font-medium">Email:</span> {profile.email}
-            </p>
-            {profile.first_name && (
-              <p className="text-gray-700">
-                <span className="font-medium">First Name:</span>{' '}
-                {profile.first_name}
-              </p>
-            )}
-            {profile.last_name && (
-              <p className="text-gray-700">
-                <span className="font-medium">Last Name:</span>{' '}
-                {profile.last_name}
-              </p>
-            )}
-
-            <p className="text-gray-700">
-              <span className="font-medium">Your User ID:</span>{' '}
-              <span className="break-all font-mono text-sm">{profile.id}</span>
-            </p>
-          </>
-        ) : (
-          <p className="text-red-600">Profile data not available.</p>
-        )}
-      </div>
-
       <div className="mt-8">
         <h3 className="mb-4 text-xl font-semibold text-gray-900">
           What's New?

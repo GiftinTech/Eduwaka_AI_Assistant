@@ -34,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = UserProfile
-    fields = ('id', 'username', 'email', 'first_name', 'last_name')
+    fields = ('id', 'username', 'email', 'first_name', 'last_name', 'photo')
     # read_only_fields = ('username', 'email')
 
 # Change pwd 

@@ -13,7 +13,7 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between bg-white p-4 shadow-md md:justify-end">
+    <header className="sticky top-0 z-40 flex items-center justify-between p-4 md:justify-end">
       <button
         className="text-gray-600 hover:text-gray-900 md:hidden"
         onClick={() => setIsSidebarOpen(true)}
@@ -31,8 +31,17 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
         <Button
           variant="secondary"
           onClick={() => navigate('/dashboard/myProfile')}
+          className="flex items-center gap-2"
         >
-          <User size={20} />
+          {user?.photo ? (
+            <img
+              src={user?.photo}
+              alt="User"
+              className="h-6 w-6 rounded-full object-cover"
+            />
+          ) : (
+            <User size={20} />
+          )}
           My Profile
         </Button>
       </div>

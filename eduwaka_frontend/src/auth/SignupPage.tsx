@@ -3,10 +3,12 @@ import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/button';
+import { useAlert } from '../hooks/useAlert';
 
 const Signup = () => {
   // Access auth functions and state from the context
   const { handleSignup, loadingAuth } = useAuth();
+  const { showAlert } = useAlert();
 
   // State for all signup form inputs and submission status
   const [username, setUsername] = useState<string>('');
@@ -52,6 +54,10 @@ const Signup = () => {
       setConfirmPassword('');
       // Navigate to the home page after successful signup/login
       navigate('/');
+      showAlert(
+        'success',
+        'Welcome to the eduwaka family! We are delighted to have you 😊',
+      );
     } else {
       // Display the error message from the API
       setFormAuthError(result.error || 'An unknown error occurred.');
@@ -72,11 +78,11 @@ const Signup = () => {
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
         </Button>
         <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
+          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
-          Create your Edu
-          <span className="text-pink-600 dark:text-pink-400">Waka</span> account
+          Create your edu
+          <span className="text-pink-600 dark:text-pink-400">waka</span> account
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

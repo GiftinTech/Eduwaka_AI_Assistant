@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Button from './ui/button';
-import { Menu, X, LogIn, UserPlus, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -11,11 +11,11 @@ const Header = () => {
   const navigate = useNavigate();
 
   const navItems = [
-    { label: 'Institution Search', href: '/institutions' },
-    { label: 'Course Search', href: '/courses' },
-    { label: 'Fee Checker', href: '/fees' },
-    { label: 'Eligibility', href: '/eligibility' },
-    { label: 'Support', href: '/support' },
+    { label: 'Institution Search', href: '/dashboard/searchInstitutions' },
+    { label: 'Course Search', href: '/dashboard/searchCourses' },
+    { label: 'Fee Checker', href: '/dashboard/tuitionChecker' },
+    { label: 'Eligibility', href: '/dashboard/eligibilityCheckerAI' },
+    { label: 'Support', href: '/dashboard/supportHelpDesk' },
   ];
 
   return (
@@ -27,7 +27,7 @@ const Header = () => {
             to="/"
             className="flex items-center space-x-2 text-xl font-bold text-foreground"
           >
-            Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
+            edu<span className="text-pink-600 dark:text-pink-400">waka</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -36,7 +36,7 @@ const Header = () => {
               <Link
                 key={item.label}
                 to={item.href}
-                className="text-muted-foreground transition-colors duration-200 hover:text-primary"
+                className="text-muted-foreground transition-colors duration-200 hover:font-[500]"
               >
                 {item.label}
               </Link>
@@ -67,11 +67,10 @@ const Header = () => {
             ) : (
               <>
                 <Button
-                  variant="hero"
-                  className="font-semibold"
+                  variant="outline"
+                  className="border font-semibold"
                   onClick={() => navigate('/login')}
                 >
-                  <LogIn className="mr-2 h-4 w-4" />
                   Login
                 </Button>
                 <Button
@@ -79,7 +78,6 @@ const Header = () => {
                   className="font-semibold"
                   onClick={() => navigate('/signup')}
                 >
-                  <UserPlus className="mr-2 h-4 w-4" />
                   Sign up
                 </Button>
               </>
@@ -89,7 +87,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-muted-foreground hover:bg-accent rounded-md p-2 hover:text-primary md:hidden"
+            className="text-muted-foreground rounded-md p-2 md:hidden"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -107,7 +105,7 @@ const Header = () => {
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="text-muted-foreground py-2 transition-colors duration-200 hover:text-primary"
+                  className="text-muted-foreground py-2 transition-colors duration-200 hover:font-[500]"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
@@ -142,25 +140,23 @@ const Header = () => {
                 ) : (
                   <>
                     <Button
-                      variant="hero"
-                      className="mt-4 w-full font-semibold"
+                      variant="outline"
+                      className="mr-2 mt-4 border font-semibold"
                       onClick={() => {
                         navigate('/login');
                         setIsMenuOpen(false);
                       }}
                     >
-                      <LogIn className="mr-2 h-4 w-4" />
                       Login
                     </Button>
                     <Button
                       variant="hero"
-                      className="mt-2 w-full font-semibold"
+                      className="ml-2 font-semibold"
                       onClick={() => {
                         navigate('/signup');
                         setIsMenuOpen(false);
                       }}
                     >
-                      <UserPlus className="mr-2 h-4 w-4" />
                       Sign up
                     </Button>
                   </>

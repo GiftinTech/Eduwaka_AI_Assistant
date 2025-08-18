@@ -18,9 +18,9 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-2 sm:p-6">
-          <div className="mx-auto max-w-4xl rounded-xl bg-white p-4 shadow-lg sm:p-8">
-            <Outlet /> {/* Render current route component */}
+        <main className="flex-1 overflow-y-auto p-2 sm:p-6">
+          <div className="mx-auto max-w-4xl rounded-xl p-4 sm:p-8">
+            <Outlet />
           </div>
         </main>
       </div>
