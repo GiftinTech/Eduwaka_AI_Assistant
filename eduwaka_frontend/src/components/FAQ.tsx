@@ -56,7 +56,7 @@ const FAQ = () => {
   return (
     <section className="font-inter relative bg-gray-100 py-16 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
       {/* Curved top edge */}
-      <div className="absolute left-0 top-0 w-full overflow-hidden">
+      {/* <div className="absolute left-0 top-0 w-full overflow-hidden">
         <svg
           className="relative block h-20 w-full fill-current text-white dark:text-gray-900" // Use fill-current and specify color
           xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@ const FAQ = () => {
         >
           <path d="M0,60 C300,0 900,120 1200,60 L1200,0 L0,0 Z"></path>
         </svg>
-      </div>
+      </div> */}
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
@@ -93,7 +93,7 @@ const FAQ = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="flex w-full items-center justify-between rounded-lg text-left transition-colors duration-200 ease-in-out hover:bg-gray-100 dark:hover:bg-gray-600"
+                    className="flex w-full items-center justify-between rounded-lg border-b border-input bg-gray-100 text-left transition-colors duration-200 ease-in-out hover:font-bold"
                     onClick={() => handleToggle(itemValue)}
                     aria-expanded={isOpen}
                     aria-controls={`accordion-content-${index}`}
@@ -123,7 +123,7 @@ const FAQ = () => {
                       isOpen
                         ? 'max-h-screen pt-0.5 opacity-100'
                         : 'max-h-0 opacity-0'
-                    }`} // max-h-screen for smooth height transition
+                    }`}
                   >
                     <div className="p-4 pt-2 text-gray-700 dark:text-gray-300">
                       {faq.answer}

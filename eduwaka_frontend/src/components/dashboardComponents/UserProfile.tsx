@@ -16,7 +16,8 @@ interface UserProfileData {
 }
 
 const UserProfile = () => {
-  const { user } = useAuth(); // Get user from context
+  const { user } = useAuth();
+
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [editMode, setEditMode] = useState<boolean>(false);
@@ -62,7 +63,6 @@ const UserProfile = () => {
         const data = await response.json();
         console.log(data.results[0]);
         setProfile(data.results[0]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error('Error fetching user profile:', error);
         setStatusMessage(error.message || 'Failed to load profile data.');
@@ -72,7 +72,7 @@ const UserProfile = () => {
     };
 
     fetchUserProfile();
-  }, [user]); // Re-fetch if user object changes (e.g., after login/logout)
+  }, [user, DJANGO_API_BASE_URL]);
 
   const handleUpdateProfile = async () => {
     if (!user) {
@@ -89,7 +89,7 @@ const UserProfile = () => {
     setStatusMessage('');
     try {
       const response = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
-        method: 'PUT', // Use PUT or PATCH depending on your DRF ViewSet setup
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -98,7 +98,6 @@ const UserProfile = () => {
           email: newEmail,
           first_name: newFirstName,
           last_name: newLastName,
-          // Do not send username or id for update unless specifically allowed by your backend
         }),
       });
 

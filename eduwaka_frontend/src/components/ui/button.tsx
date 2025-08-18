@@ -21,19 +21,21 @@ const variantClasses: Record<Variant, string> = {
   destructive:
     'bg-destructive text-destructive-foreground hover:bg-destructive/90',
   outline:
-    'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+    'border-input bg-background hover:bg-accent hover:text-accent-foreground',
   secondary:
     'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-card',
   ghost: 'hover:bg-accent hover:text-accent-foreground',
   link: 'text-primary underline-offset-4 hover:underline',
-  hero: 'bg-gradient-hero text-primary-foreground hover:shadow-glow transform hover:scale-105 transition-all duration-300',
+  // Merged and updated hero variant with pink dominant gradient
+  hero: 'rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-600 text-white shadow-lg hover:from-blue-600 hover:to-fuchsia-700 hover:shadow-xl active:translate-y-0.5 active:shadow-md transform hover:scale-105 transition-all duration-300',
   accent: 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-card',
 };
 
 const sizeClasses: Record<Size, string> = {
   default: 'h-10 px-4 py-2',
   sm: 'h-9 rounded-md px-3',
-  lg: 'h-11 rounded-md px-3',
+  // Updated lg size to match the new button's padding and text size
+  lg: 'h-auto px-8 py-4 text-lg',
   icon: 'h-10 w-10',
 };
 

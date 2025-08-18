@@ -53,7 +53,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
+    <div className="flex min-h-screen animate-swirl items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
       <div className="relative w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 hover:scale-[1.02] dark:bg-gray-800">
         <button
           onClick={() => navigate('/login')}
@@ -63,7 +63,7 @@ const ForgotPassword = () => {
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
         </button>
         <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-purple-600 dark:text-purple-400">Waka</span>
+          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
           Reset Your Password

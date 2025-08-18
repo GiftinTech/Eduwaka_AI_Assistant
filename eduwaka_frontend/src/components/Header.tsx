@@ -1,14 +1,7 @@
-import Button from './ui/button';
-import {
-  GraduationCap,
-  Menu,
-  X,
-  LogIn,
-  UserPlus,
-  User,
-  LogOut,
-} from 'lucide-react';
 import { useState } from 'react';
+import Button from './ui/button';
+import { Menu, X, LogIn, UserPlus, User, LogOut } from 'lucide-react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -30,11 +23,11 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary">
-              <GraduationCap className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">EduWaka</span>
+          <Link
+            to="/"
+            className="flex items-center space-x-2 text-xl font-bold text-foreground"
+          >
+            Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
           </Link>
 
           {/* Desktop Navigation */}

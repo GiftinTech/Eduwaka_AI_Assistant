@@ -61,10 +61,10 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
+    <div className="flex min-h-screen animate-swirl items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl dark:bg-gray-800">
         <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-purple-600 dark:text-purple-400">Waka</span>
+          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
         </h2>
         <p className="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
           Reset Your Password

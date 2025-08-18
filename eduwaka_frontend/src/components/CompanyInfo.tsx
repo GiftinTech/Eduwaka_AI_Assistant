@@ -12,90 +12,97 @@ import eduwakaLogo from '../assets/edu_logo.svg';
 const CompanyInformation: React.FC = () => {
   return (
     <article className="relative block bg-[hsl(192,100%,9%)] p-[5%] pt-[20%] text-[hsl(207,100%,98%)] sm:flex sm:flex-row-reverse sm:pt-[5%]">
+      {/* keep your background untouched */}
       <div
         className={`absolute bottom-[82%] left-0 h-[25%] w-full bg-[image:var(--mobile-bg)] bg-contain bg-no-repeat sm:bottom-[99%] sm:h-[42%] sm:bg-cover md:bg-[image:var(--desktop-bg)]`}
       ></div>
-      <section className="sm:pl-[10%]">
-        <h1 className="mt-0 text-xl font-bold">
-          Email Notifications/Updates on Schools
-        </h1>
-        <p className="pr-[30%]">
-          Subscribe to receive timely email updates on admission news,
-          deadlines, and important announcements from your preferred
-          institutions. We’ll never send you spam or pass on your email address
-        </p>
-        <form className="mt-4 sm:max-sm:flex sm:max-sm:flex-col" action="">
-          <input
-            className="mt-4 w-full rounded-md border-none p-2 sm:w-[60%]"
-            type="email"
-            required
-          />
-          <button
-            className={`animate-slide-in-dynamic-x ml-[50%] mt-2 w-1/2 rounded-md bg-[hsl(322,100%,66%)] p-2 font-semibold text-[hsl(207,100%,98%)] transition duration-700 [--tw-slide-from-x:-100%] hover:bg-[hsl(321,100%,78%)] sm:ml-[2%] sm:mt-0 sm:w-[36%] sm:[--tw-slide-from-x:-50%] md:[--tw-slide-from-x:-25%] lg:[--tw-slide-from-x:0] xl:[--tw-slide-from-x:-10%]`}
-          >
-            Subscribe
-          </button>
-        </form>
-      </section>
-      <section className="pr-[10%]">
-        <figure className="mb-4 ml-0 mt-[4rem]">
-          <img
-            className="h-[2rem] w-auto"
-            src={eduwakaLogo}
-            alt="Eduwaka Logo"
-          />
-        </figure>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nulla
-          quam, hendrerit lacinia vestibulum a, ultrices quis sem.
-        </p>
-        <ul className="mt-8 list-none p-0" id="data-list1">
-          <li>
-            <figure className="m-0 flex items-center">
-              <IoCall size={24} />
-              <figcaption className="ml-4">
-                <a
-                  href="tel:+1-543-123-4567"
-                  className="hover:text-aqua text-[hsl(207,100%,98%)] no-underline"
-                >
-                  Phone: +1-543-123-4567
-                </a>
-              </figcaption>
-            </figure>
-          </li>
-          <li>
-            <figure className="m-0 flex items-center">
-              <IoMail size={24} />
-              <figcaption className="ml-4">
-                <a
-                  href="mailto:example@fylo.com"
-                  className="hover:text-aqua text-[hsl(207,100%,98%)] no-underline"
-                >
-                  example@fylo.com
-                </a>
-              </figcaption>
-            </figure>
-          </li>
-        </ul>
 
-        <ul className="mt-8 flex list-none p-0" id="data-list2">
-          <li className="mx-[2%]">
-            <a href="#" className="hover:text-aqua">
-              <IoLogoFacebook size={24} />
-            </a>
-          </li>
-          <li className="mx-[2%]">
-            <a href="#" className="hover:text-aqua">
-              <IoLogoTwitter size={24} />
-            </a>
-          </li>
-          <li className="mx-[2%]">
-            <a href="#" className="hover:text-aqua">
-              <IoLogoInstagram size={24} />
-            </a>
-          </li>
-        </ul>
-      </section>
+      {/* constrain content */}
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 sm:flex-row-reverse sm:gap-10 lg:ml-20">
+        {/* newsletter */}
+        <section className="sm:flex-1">
+          <h1 className="mt-0 text-xl font-bold">
+            Email Notifications / Updates on Schools
+          </h1>
+          <p className="mt-2 max-w-md">
+            Subscribe to receive timely email updates on admission news,
+            deadlines, and important announcements from your preferred
+            institutions. We’ll never send you spam or pass on your email
+            address.
+          </p>
+          <form
+            className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center"
+            action=""
+          >
+            <input
+              className="w-full rounded-md border-none p-3 text-black outline-none sm:w-[65%]"
+              type="email"
+              placeholder="Enter your email"
+              required
+            />
+            <button
+              className={`w-full animate-slide-in-dynamic-x rounded-md bg-[hsl(322,100%,66%)] p-3 font-semibold text-[hsl(207,100%,98%)] transition duration-700 [--tw-slide-from-x:-100%] hover:bg-[hsl(321,100%,78%)] sm:w-auto sm:px-6 sm:[--tw-slide-from-x:-50%] md:[--tw-slide-from-x:-25%] lg:[--tw-slide-from-x:0] xl:[--tw-slide-from-x:-10%]`}
+            >
+              Subscribe
+            </button>
+          </form>
+        </section>
+
+        {/* company info */}
+        <section className="sm:flex-1 lg:-mt-8">
+          <figure>
+            <img
+              className="h-20 w-auto" // was h-8
+              src={eduwakaLogo}
+              alt="Eduwaka Logo"
+            />
+          </figure>
+
+          <p className="max-w-md text-sm leading-relaxed">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
+            nulla quam, hendrerit lacinia vestibulum a, ultrices quis sem.
+          </p>
+
+          <ul className="mt-4 space-y-4 text-sm">
+            <li className="flex items-center">
+              <IoCall size={20} />
+              <a
+                href="tel:+1-543-123-4567"
+                className="ml-3 hover:text-[hsl(322,100%,66%)]"
+              >
+                +234-90-003-566-02
+              </a>
+            </li>
+            <li className="flex items-center">
+              <IoMail size={20} />
+              <a
+                href="mailto:example@fylo.com"
+                className="ml-3 hover:text-[hsl(322,100%,66%)]"
+              >
+                eduwaka@edu.com
+              </a>
+            </li>
+          </ul>
+
+          <ul className="mt-5 flex gap-6">
+            <li>
+              <a href="#" className="hover:text-[hsl(322,100%,66%)]">
+                <IoLogoFacebook size={24} />
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-[hsl(322,100%,66%)]">
+                <IoLogoTwitter size={24} />
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-[hsl(322,100%,66%)]">
+                <IoLogoInstagram size={24} />
+              </a>
+            </li>
+          </ul>
+        </section>
+      </div>
     </article>
   );
 };

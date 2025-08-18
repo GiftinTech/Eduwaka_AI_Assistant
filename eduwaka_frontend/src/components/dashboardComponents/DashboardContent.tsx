@@ -1,8 +1,7 @@
 import { useEffect, useState, type JSX } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { BookOpen, EditIcon, ListChecks, Search } from 'lucide-react';
+import { BookOpen, ListChecks, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../ui/button';
 
 interface DashboardCardProps {
   title: string;
@@ -42,6 +41,7 @@ const DashboardContent = () => {
   const navigate = useNavigate();
 
   const { user } = useAuth(); // Get user from context
+
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
   const [profileError, setProfileError] = useState<string>('');
@@ -97,7 +97,8 @@ const DashboardContent = () => {
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        Welcome to Edu<span className="text-indigo-700">Waka!</span>
+        Welcome to Edu
+        <span className="text-pink-600 dark:text-pink-400">Waka!</span>
       </h2>
       <p className="mb-8 text-lg text-gray-700">
         Your personalized guide to university admissions in Nigeria.
@@ -128,14 +129,6 @@ const DashboardContent = () => {
           <h3 className="mb-4 text-xl font-semibold text-indigo-800">
             Your Profile Summary{' '}
           </h3>
-          <div className="group relative inline-block">
-            <Button variant="ghost" className="cursor-pointer">
-              <EditIcon size={20} />
-            </Button>
-            <div className="absolute bottom-full left-1/2 z-10 mb-2 w-max -translate-x-1/2 scale-0 transform rounded bg-gray-800 px-2 py-1 text-sm text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-              Edit Profile
-            </div>
-          </div>
         </div>
 
         {loadingProfile ? (

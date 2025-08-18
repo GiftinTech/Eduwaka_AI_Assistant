@@ -23,7 +23,7 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
       <div className="flex items-center space-x-4">
         <span className="font-medium text-gray-700">
           Hello,{' '}
-          <span className="font-bold text-indigo-700">
+          <span className="font-bold">
             {user?.username.toUpperCase() || user?.email || 'User'}
           </span>
           !

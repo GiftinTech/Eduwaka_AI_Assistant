@@ -27,91 +27,87 @@ const Features = () => {
       icon: Search,
       title: 'Institution Search',
       description: 'Find the perfect university',
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900',
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-500/10',
     },
     {
       icon: BookOpen,
       title: 'Course Search',
       description: 'Explore thousands of courses',
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-100 dark:bg-orange-900',
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-500/10',
     },
     {
       icon: DollarSign,
       title: 'Fee Checker',
       description: 'Get accurate tuition estimates',
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900',
+      color: 'text-green-500',
+      bgColor: 'bg-green-500/10',
     },
     {
       icon: CheckCircle,
       title: 'Eligibility Checker',
       description: 'Check course qualification',
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900',
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-500/10',
     },
     {
       icon: GraduationCap,
       title: 'JAMB Subject Checker',
       description: 'Verify required subjects',
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-100 dark:bg-orange-900',
+      color: 'text-pink-500',
+      bgColor: 'bg-pink-500/10',
     },
     {
       icon: BookOpen,
       title: "O'Level Checker",
       description: "Check O'Level requirements",
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900',
+      color: 'text-teal-500',
+      bgColor: 'bg-teal-500/10',
     },
     {
       icon: Info,
       title: 'Institution Overview',
       description: 'University information',
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900',
+      color: 'text-rose-500',
+      bgColor: 'bg-rose-500/10',
     },
     {
       icon: Calendar,
       title: 'Admission Calendar',
       description: 'Important dates & deadlines',
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-100 dark:bg-orange-900',
+      color: 'text-cyan-500',
+      bgColor: 'bg-cyan-500/10',
     },
     {
       icon: Bell,
       title: 'Email Notifications',
       description: 'Get admission updates',
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900',
+      color: 'text-lime-500',
+      bgColor: 'bg-lime-500/10',
     },
     {
       icon: HelpCircle,
       title: 'Support Desk',
       description: '24/7 admission support',
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-100 dark:bg-blue-900',
+      color: 'text-red-500',
+      bgColor: 'bg-red-500/10',
     },
     {
       icon: Bot,
       title: 'AI Chatbot',
       description: 'Instant AI-powered answers',
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-100 dark:bg-orange-900',
+      color: 'text-amber-500',
+      bgColor: 'bg-amber-500/10',
     },
     {
       icon: MessageSquare,
       title: 'FAQ Section',
       description: 'Common admission questions',
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-100 dark:bg-green-900',
+      color: 'text-fuchsia-500',
+      bgColor: 'bg-fuchsia-500/10',
     },
   ];
-
-  const firstRowFeatures = features.slice(0, 4);
-  const secondRowFeatures = features.slice(4, 8);
-  const thirdRowFeatures = features.slice(8, 12);
 
   type Feature = {
     icon: React.ElementType;
@@ -121,23 +117,22 @@ const Features = () => {
     bgColor: string;
   };
 
-  const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({
-    feature,
-    index,
-  }) => {
-    console.log(index);
+  const FeatureCard: React.FC<{ feature: Feature }> = ({ feature }) => {
     const IconComponent = feature.icon;
     return (
-      <div className="group mx-4 w-80 flex-shrink-0 transform rounded-2xl border border-gray-200 bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800">
+      <div className="group relative flex-shrink-0 transform rounded-2xl border border-gray-200/20 bg-white/60 p-6 text-center shadow-md backdrop-blur-md transition-all duration-500 hover:-translate-y-3 hover:shadow-xl dark:border-gray-700/40 dark:bg-gray-800/50">
+        {/* subtle gradient highlight on hover */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-blue-200/20 to-purple-200/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-blue-900/10 dark:to-purple-900/10" />
+
         <div
-          className={`h-12 w-12 rounded-xl ${feature.bgColor} mb-4 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+          className={`relative z-10 h-14 w-14 rounded-2xl ${feature.bgColor} mx-auto mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
         >
-          <IconComponent className={`h-6 w-6 ${feature.color}`} />
+          <IconComponent className={`h-7 w-7 ${feature.color}`} />
         </div>
-        <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <h3 className="relative z-10 mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           {feature.title}
         </h3>
-        <p className="text-base text-gray-700 dark:text-gray-300">
+        <p className="relative z-10 text-sm text-gray-600 dark:text-gray-300">
           {feature.description}
         </p>
       </div>
@@ -147,82 +142,47 @@ const Features = () => {
   return (
     <section
       id="features"
-      className="bg-muted/30 font-inter relative overflow-hidden py-20 dark:bg-gray-800"
+      className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-100 py-24 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
     >
-      {/* Curved top edge - facing downwards */}
-      <div className="absolute left-0 top-0 w-full overflow-hidden">
+      {/* wavy top edge */}
+      {/* <div className="absolute left-0 top-0 w-full overflow-hidden">
         <svg
-          className="relative block h-20 w-full bg-[hsl(192,100%,9%)] fill-[hsl(192,100%,9%)] text-white dark:text-gray-900"
+          className="relative block h-20 w-full fill-white dark:fill-gray-900"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
         >
           <path d="M0,0 C300,80 900,80 1200,0 L1200,120 L0,120 Z"></path>
         </svg>
-      </div>
+      </div> */}
 
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-foreground dark:text-gray-100 md:text-4xl">
+      <div className="container relative z-10 mx-auto px-6 sm:px-8">
+        <div className="mb-10 text-center">
+          <h2 className="mb-4 text-4xl font-extrabold text-gray-900 dark:text-white">
             Everything You Need for University Admission
           </h2>
-          <p className="text-muted-foreground mx-auto max-w-3xl text-xl dark:text-gray-300">
-            Our comprehensive platform provides all the tools and information
-            you need to make informed decisions about your educational future.
+          <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+            Our all-in-one platform provides the right tools to help you make
+            informed decisions about your educational journey.
           </p>
         </div>
 
         <div
-          className={`space-y-8 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`mx-auto grid max-w-5xl grid-cols-2 place-content-center gap-6 transition-all duration-1000 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
+            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+          }`}
         >
-          {/* First Row - Right to Left */}
-          <div className="relative">
-            <div className="flex animate-[scroll-right_20s_linear_infinite] hover:[animation-play-state:paused]">
-              {[...firstRowFeatures, ...firstRowFeatures].map(
-                (feature, index) => (
-                  <FeatureCard
-                    key={`row1-${index}`}
-                    feature={feature}
-                    index={index}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-
-          {/* Second Row - Left to Right */}
-          <div className="relative">
-            <div className="flex animate-[scroll-left_20s_linear_infinite] hover:[animation-play-state:paused]">
-              {[...secondRowFeatures, ...secondRowFeatures].map(
-                (feature, index) => (
-                  <FeatureCard
-                    key={`row2-${index}`}
-                    feature={feature}
-                    index={index}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-
-          {/* Third Row - Right to Left */}
-          <div className="relative">
-            <div className="flex animate-[scroll-right_20s_linear_infinite] hover:[animation-play-state:paused]">
-              {[...thirdRowFeatures, ...thirdRowFeatures].map(
-                (feature, index) => (
-                  <FeatureCard
-                    key={`row3-${index}`}
-                    feature={feature}
-                    index={index}
-                  />
-                ),
-              )}
-            </div>
-          </div>
+          {features.map((feature, index) => (
+            <FeatureCard key={`feature-${index}`} feature={feature} />
+          ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <Button variant="hero" size="lg" className="px-8 py-4">
+        <div className="mt-20 text-center">
+          <Button
+            variant="hero"
+            size="lg"
+            className="rounded-full px-8 py-4 shadow-lg"
+          >
             <Users className="mr-2 h-5 w-5" />
             Start Your Journey Today
           </Button>

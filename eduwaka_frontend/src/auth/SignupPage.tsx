@@ -61,7 +61,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="animate-swirl flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4 py-5">
+    <div className="flex min-h-screen animate-swirl items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4 py-5">
       <div className="relative w-full rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800 sm:max-w-lg">
         <Button
           variant="outline"
@@ -72,10 +72,11 @@ const Signup = () => {
           <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
         </Button>
         <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          Edu<span className="text-indigo-600 dark:text-indigo-400">Waka</span>
+          Edu<span className="text-pink-600 dark:text-pink-400">Waka</span>
         </h2>
         <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
-          Create your EduWaka account
+          Create your Edu
+          <span className="text-pink-600 dark:text-pink-400">Waka</span> account
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

@@ -14,10 +14,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    --primary: 213 94% 68%;
+    --primary: 213 94% 68%; /* Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 25 95% 53%;
+    --secondary: 330 80% 60%; /* Pink */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 13% 96%;
@@ -35,7 +35,7 @@
 
     /* Custom Educational Theme Variables */
     --primary-glow: 213 94% 85%;
-    --secondary-glow: 25 95% 75%;
+    --secondary-glow: 330 80% 80%; /* Pink Glow */
     --accent-glow: 158 64% 75%;
 
     /* Gradients */
@@ -105,7 +105,7 @@
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 330 80% 60%; /* Pink in dark mode */
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;

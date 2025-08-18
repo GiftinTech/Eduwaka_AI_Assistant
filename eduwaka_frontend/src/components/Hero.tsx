@@ -30,7 +30,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20 md:px-16">
       {/* Background Pattern - adjusted for a white background */}
       <div className="absolute inset-0 opacity-10">
         {/* Removed bg-gradient-to-br, replaced with a subtle solid background */}
@@ -121,17 +121,15 @@ const Hero = () => {
               <img
                 src={heroIllustration}
                 alt="Nigerian students studying with modern technology"
-                className="h-auto w-full transform object-cover transition-transform duration-700 hover:scale-105"
+                className="h-full w-full transform object-cover transition-transform duration-700 hover:scale-105"
               />
             </div>
-            <div className="absolute -right-6 -top-6 z-0 h-full w-full rounded-2xl bg-gradient-secondary opacity-30"></div>
-            <div className="absolute -bottom-6 -left-6 z-0 h-full w-full rounded-2xl bg-gradient-primary opacity-20"></div>
           </div>
         </div>
       </div>
 
       {/* Curved bottom edge */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
+      {/* <div className="absolute bottom-0 left-0 w-full overflow-hidden">
         <svg
           className="relative block h-20 w-full fill-[hsl(192,100%,9%)] dark:fill-black"
           xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +138,7 @@ const Hero = () => {
         >
           <path d="M0,60 C300,150 900,-30 1200,60 L1200,120 L0,120 Z"></path>
         </svg>
-      </div>
+      </div> */}
     </section>
   );
 };
