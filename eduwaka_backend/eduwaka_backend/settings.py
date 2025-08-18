@@ -48,7 +48,13 @@ INSTALLED_APPS = [
     'rest_framework', # DRF
     'rest_framework_simplejwt', # Simple JWT for auth
     'corsheaders', # CORS headers for Frontend comms
-    'api', # new API app
+
+    'apps.users',
+    'apps.courses',
+    'apps.institutions',
+    'apps.ai_assistant',
+    'core',
+
 ]
 
 MIDDLEWARE = [
@@ -120,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Custom User model
-AUTH_USER_MODEL = 'api.UserProfile'
+AUTH_USER_MODEL = 'users.UserProfile'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -196,7 +202,7 @@ MIDDLEWARE = [
 
 # Check for softdelete status in backends.py
 AUTHENTICATION_BACKENDS = [
-    'api.backends.SoftDeleteAuthenticationBackend',
+    'core.authentication.SoftDeleteAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
