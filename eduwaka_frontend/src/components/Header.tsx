@@ -56,8 +56,8 @@ const Header = () => {
                   {user.username || 'User'} Profile
                 </Button>
                 <Button
-                  variant="hero"
-                  className="font-semibold"
+                  variant="outline"
+                  className="border font-semibold"
                   onClick={handleLogout}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
@@ -116,7 +116,7 @@ const Header = () => {
                   <>
                     <Button
                       variant="hero"
-                      className="mt-4 w-full font-semibold"
+                      className="mr-2 mt-4 font-semibold"
                       onClick={() => {
                         navigate('/dashboard');
                         setIsMenuOpen(false);
@@ -126,8 +126,8 @@ const Header = () => {
                       {user.username || 'User'} Profile
                     </Button>
                     <Button
-                      variant="hero"
-                      className="mt-2 w-full font-semibold"
+                      variant="outline"
+                      className="ml-2 border font-semibold"
                       onClick={() => {
                         handleLogout();
                         setIsMenuOpen(false);

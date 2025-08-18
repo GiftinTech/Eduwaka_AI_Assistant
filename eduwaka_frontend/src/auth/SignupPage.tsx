@@ -53,7 +53,7 @@ const Signup = () => {
       setLastName('');
       setConfirmPassword('');
       // Navigate to the home page after successful signup/login
-      navigate('/');
+      navigate('/dashboard');
       showAlert(
         'success',
         'Welcome to the eduwaka family! We are delighted to have you 😊',
