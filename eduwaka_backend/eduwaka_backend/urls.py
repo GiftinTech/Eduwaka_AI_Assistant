@@ -18,16 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    path('api/', include('apps.users.urls')),
     
-    path('users/', include('apps.users.urls')),
-    path('courses/', include('apps.courses.urls')),
-    path('institutions/', include('apps.institutions.urls')),
-    path('admissions/', include('apps.ai_assistant.urls')),
+    path('api/', include('apps.users.urls')),
+    path('api/courses/', include('apps.courses.urls')),
+    path('api/institutions/', include('apps.institutions.urls')),
+    path('api/ai/', include('apps.ai_assistant.urls')),
+    path('', RedirectView.as_view(url='/api/'))
 ]
 
 # Serve media files in development
