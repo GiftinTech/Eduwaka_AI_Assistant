@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -28,7 +29,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mk07t=)mmag0k0j#8uh!!!d%^*^88+peot%)$dpg^h_2&o1rr)'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -208,6 +209,12 @@ AUTHENTICATION_BACKENDS = [
 
 # Forgot pwd and Reset pwd Email config
 PASSWORD_RESET_TIMEOUT = 60 * 10  # Valid for 10 minutes
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # use SMTP in production
 
