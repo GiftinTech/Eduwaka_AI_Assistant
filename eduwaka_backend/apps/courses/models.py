@@ -5,7 +5,7 @@ from apps.institutions.models import Institution
 class Course(models.Model):
   institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='courses')
   name = models.CharField(max_length=255)
-  faculty = models.CharField(max_length=255, blank=True, null=True)
+  faculty = models.CharField(max_length=255, blank=True, null=True) 
   department = models.CharField(max_length=255, blank=True, null=True)
   duration_years = models.IntegerField(help_text="Duration in years")
 

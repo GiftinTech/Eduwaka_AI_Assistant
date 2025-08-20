@@ -10,3 +10,4 @@ router.register(r"institutions", InstitutionViewSet)
 urlpatterns = [
   path("", include(router.urls)), 
 ]
+ 

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from apps.institutions.models import Institution
 from apps.institutions.serializers import InstitutionSerializer
 from apps.courses.serializers import CourseSerializer
-from .permissions import IsAdminOrReadOnly
+from core.utils import IsAdminOrReadOnly
 
 # ViewSet for Institution model
 class InstitutionViewSet(viewsets.ModelViewSet):
