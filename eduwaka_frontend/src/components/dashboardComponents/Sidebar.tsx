@@ -121,7 +121,7 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
         </button>
       </div>
       <div className="h-auto">
-        <nav className="space-y-3">
+        <nav className="custom-scrollbar max-h-[75vh] space-y-3 overflow-y-auto pr-2">
           <SidebarItem
             icon={<Home size={20} />}
             label="Dashboard"

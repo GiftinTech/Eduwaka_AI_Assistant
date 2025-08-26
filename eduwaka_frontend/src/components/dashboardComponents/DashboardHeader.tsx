@@ -2,7 +2,6 @@
 import { Menu, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import Button from '../ui/button';
 
 interface DashboardHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -13,7 +12,7 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between p-4 md:justify-end">
+    <header className="sticky top-0 z-40 flex items-center justify-between p-4 md:justify-end lg:pr-20">
       <button
         className="text-gray-600 hover:text-gray-900 md:hidden"
         onClick={() => setIsSidebarOpen(true)}
@@ -28,8 +27,7 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
           </span>
           !
         </span>
-        <Button
-          variant="secondary"
+        <button
           onClick={() => navigate('/dashboard/myProfile')}
           className="flex items-center gap-2"
         >
@@ -37,13 +35,12 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
             <img
               src={user?.photo}
               alt="User"
-              className="h-6 w-6 rounded-full object-cover"
+              className="h-8 w-8 rounded-full object-cover"
             />
           ) : (
             <User size={20} />
           )}
-          My Profile
-        </Button>
+        </button>
       </div>
     </header>
   );

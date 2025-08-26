@@ -1,15 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import {
+  useState,
+  useRef,
+  useEffect,
+  type ChangeEvent,
+  type KeyboardEvent,
+} from 'react';
+import ReactMarkdown from 'react-markdown';
+
+interface MessagePart {
+  text: string;
+}
 
 interface Message {
-  role: 'user' | 'bot';
-  text: string;
+  role: 'user' | 'model';
+  parts: MessagePart[];
 }
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
@@ -17,10 +30,59 @@ const Chatbot = () => {
     return localStorage.getItem('access_token');
   };
 
+  // fetch history on component mount
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setIsLoading(true);
+      const authToken = getAuthToken();
+      if (!authToken) {
+        setMessages([
+          {
+            role: 'model',
+            parts: [{ text: 'Please log in to use the chatbot.' }],
+          },
+        ]);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${DJANGO_API_BASE_URL}ai/chat_history/`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const history = await response.json();
+          setMessages(history);
+        } else {
+          console.error('Failed to fetch chat history.');
+        }
+      } catch (error) {
+        console.error('Error fetching chat history:', error);
+      } finally {
+        setIsLoading(false);
+        setHasLoaded(true);
+      }
+    };
+
+    if (!hasLoaded) {
+      fetchHistory();
+    }
+  }, [hasLoaded, DJANGO_API_BASE_URL]);
+
+  // Auto scroll whenever messages or loading state changes
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isLoading]);
+
   const handleSendMessage = async () => {
     if (input.trim() === '') return;
 
-    const newMessages: Message[] = [...messages, { role: 'user', text: input }];
+    const userMessage: Message = { role: 'user', parts: [{ text: input }] };
+    const newMessages = [...messages, userMessage];
+
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
@@ -29,44 +91,45 @@ const Chatbot = () => {
     if (!authToken) {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: 'bot', text: 'Please log in to use the chatbot.' },
+        {
+          role: 'model',
+          parts: [{ text: 'Please log in to use the chatbot.' }],
+        },
       ]);
       setIsLoading(false);
       return;
     }
 
     try {
-      // Send chat history to eduwaka_backend
-      const response = await fetch(`${DJANGO_API_BASE_URL}chatbot/`, {
-        // New endpoint for chatbot
+      const response = await fetch(`${DJANGO_API_BASE_URL}ai/chatbot/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({ chat_history: newMessages }), // Send the entire chat history
+        body: JSON.stringify({ chat_history: newMessages }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          errorData.detail ||
-            errorData.message ||
-            `HTTP error! status: ${response.status}`,
-        );
+        throw new Error(errorData.detail);
       }
 
       const result = await response.json();
       const botResponse: string = result.bot_reply;
+
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: 'bot', text: botResponse },
+        { role: 'model', parts: [{ text: botResponse }] },
       ]);
     } catch (error: any) {
       console.error('Error communicating with chatbot backend:', error);
-      setMessages((prevMessages: any) => [
-        ...prevMessages,
-        { role: 'bot', text: `An error occurred: ${error.message}.` },
+      const errorMessage =
+        error.message || 'An unexpected error occurred. Please try again.';
+
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { role: 'model', parts: [{ text: errorMessage }] },
       ]);
     } finally {
       setIsLoading(false);
@@ -81,30 +144,34 @@ const Chatbot = () => {
         "What are the requirements for Computer Science at UNILAG?".
       </p>
       <div className="flex h-96 flex-col rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <div className="mb-4 flex-1 space-y-3 overflow-y-auto p-2">
+        <div className="custom-scrollbar mb-4 flex-1 space-y-3 overflow-y-auto p-2">
           {messages.length === 0 && (
             <div className="mt-10 text-center text-gray-500">
               Type a message to start chatting!
             </div>
           )}
-          {messages.map(
-            (msg: { role: string; text: string }, index: number) => (
+          {messages.map((msg, index: number) => (
+            <div
+              key={index}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
               <div
-                key={index}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`max-w-xs rounded-lg p-3 shadow-sm ${
+                  msg.role === 'user'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
               >
-                <div
-                  className={`max-w-xs rounded-lg p-3 shadow-sm ${
-                    msg.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-800'
-                  }`}
-                >
-                  {msg.text}
-                </div>
+                {msg.role === 'user' ? (
+                  <p>{msg.parts.map((part) => part.text).join('')}</p>
+                ) : (
+                  <ReactMarkdown>
+                    {msg.parts.map((part) => part.text).join('')}
+                  </ReactMarkdown>
+                )}
               </div>
-            ),
-          )}
+            </div>
+          ))}
           {isLoading && (
             <div className="flex justify-start">
               <div className="max-w-xs rounded-lg bg-gray-200 p-3 text-gray-800 shadow-sm">
@@ -112,6 +179,8 @@ const Chatbot = () => {
               </div>
             </div>
           )}
+          {/* 👇 Dummy div for auto-scroll */}
+          <div ref={bottomRef} />
         </div>
         <div className="flex">
           <input

@@ -10,7 +10,7 @@ const DashboardLayout = () => {
     <div className="font-inter flex bg-gray-100">
       {/* Sidebar */}
       <aside
-        className={`custom-scrollbar fixed inset-y-0 left-0 min-w-80 transform bg-white p-6 shadow-xl ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} z-50 overflow-y-auto transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
+        className={`fixed inset-y-0 left-0 min-w-80 transform bg-white p-6 shadow-xl ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} z-50 overflow-y-auto transition-transform duration-300 ease-in-out md:relative md:translate-x-0`}
       >
         <Sidebar setIsSidebarOpen={setIsSidebarOpen} />
       </aside>

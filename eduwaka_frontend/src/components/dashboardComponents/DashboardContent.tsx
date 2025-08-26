@@ -1,6 +1,6 @@
 import { type JSX } from 'react';
 
-import { BookOpen, ListChecks, Search } from 'lucide-react';
+import { BookOpen, Bot, ListChecks, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface DashboardCardProps {
@@ -59,6 +59,12 @@ const DashboardContent = () => {
           title="Exam Prep"
           description="Tools to help you prepare for CBT exams."
           icon={<BookOpen size={24} />}
+        />
+        <DashboardCard
+          title="Chat EduwakaBot"
+          description="Ask Eduwaka assistant anything about your admission journey."
+          icon={<Bot size={24} />}
+          onClick={() => navigate('chatbot/')}
         />
       </div>
       <div className="mt-8">

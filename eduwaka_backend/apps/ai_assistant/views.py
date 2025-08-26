@@ -6,6 +6,7 @@ import json
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from apps.ai_assistant.serializers import EligibilityCheckRequestSerializer, ChatbotRequestSerializer 
+from .models import ChatHistory
 
 # Configure Gemini API with the key from settings
 genai.configure(api_key=settings.GEMINI_API_KEY)
@@ -101,38 +102,92 @@ class EligibilityCheckAPIView(APIView):
       return Response({"detail": f"Error processing eligibility check: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ChatbotAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+  permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-      # Use the serializer for validation
-      serializer = ChatbotRequestSerializer(data=request.data)
-      serializer.is_valid(raise_exception=True) # Raise exception if validation fails
-      chat_history = serializer.validated_data['chat_history']
-      
-      # Convert frontend chat history format to Gemini's expected format
-      # The serializer ensures the structure is already correct for 'role' and 'parts'
-      gemini_chat_history = []
-      for msg in chat_history:
-        # Reconstruct to exact Gemini format, though it should largely match now
-        gemini_chat_history.append({"role": msg['role'], "parts": msg['parts']})
-
-      if not gemini_chat_history:
-        return Response({"detail": "No valid chat history provided after serialization."}, status=status.HTTP_400_BAD_REQUEST)        # Ensure 'text' key exists before accessing
+  def post(self, request, *args, **kwargs):
+    # Use the serializer for validation
+    serializer = ChatbotRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    latest_user_message = serializer.validated_data['chat_history'][-1]['parts'][0]['text']
+  
+    # Save the user's message to the database
+    user_message_obj = ChatHistory.objects.create(
+      user=request.user,
+      role='user',
+      message=latest_user_message
+    )
+  
+    #Fetch the full chat history from the database to send to Gemini
+    chat_objects = ChatHistory.objects.filter(user=request.user).order_by('timestamp')
     
-      try:
-        # Get the latest user message
-        latest_user_message = gemini_chat_history[-1]['parts'][0]['text']
+    # Convert frontend chat history format to Gemini's expected format
+    gemini_chat_history = []
+    for chat_obj in chat_objects:
+      gemini_chat_history.append({
+        "role": 'model' if chat_obj.role == 'bot' else chat_obj.role,
+        "parts": [{"text": chat_obj.message}]
+      })
 
-        concise_prompt = f"{latest_user_message}. Keep your response very concise and to the point, suitable for a quick read."
-        # Or: concise_prompt = f"{latest_user_message}. Respond briefly, like you're texting."
-        # Or: concise_prompt = f"{latest_user_message}. Give a short, direct answer."
+    if not gemini_chat_history:
+      return Response({"detail": "No valid chat history provided after serialization."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Define the system instruction for the Gemini model
+    system_instruction_text = (
+      "You are an AI assistant specialized in Nigerian university admissions. "
+      "Your sole purpose is to provide information and guidance related to the admission processes of universities and other tertiary institutions in Nigeria. "
+      "Do not engage in conversations outside of this topic. If a user asks about something else, politely state that you can only assist with Nigerian admission-related questions."
+      "\n\n**IMPORTANT: Format your response using Markdown for easy readability.**"
+    )
+    initial_instruction = {"role": "user", "parts": [{"text": system_instruction_text}]}
+    initial_response = {"role": "model", "parts": [{"text": "Hello, how can I help you with Nigerian admissions?"}]}
+    full_contents = [initial_instruction, initial_response] + gemini_chat_history
 
-        chat = model.start_chat(history=gemini_chat_history[:-1])
-        response = chat.send_message(concise_prompt) # Send the modified prompt
+   # map of technical errors to user-friendly messages
+    error_map = {
+      "unexpected keyword argument 'system_instruction'": "We're having trouble with our AI assistant. Please try your message again.",
+      "400 Please use a valid role: user, model.": "There was an issue with the conversation format. Let's start fresh!",
+      "connection refused": "It looks like the server is busy. Please give it a minute and try again.",
+      "invalid request": "Sorry, I can't process that request. Could you rephrase your question?",
+    }
 
-        bot_reply = response.text
-        return Response({"bot_reply": bot_reply}, status=status.HTTP_200_OK)
+    try:
+      response = model.generate_content(contents=full_contents)
+      
+      bot_reply = response.text
 
-      except Exception as e:
-        print(f"Error calling Gemini API for chatbot: {e}")
-        return Response({"detail": f"Error processing chatbot request: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      # Save model's reply to the database
+      ChatHistory.objects.create(
+        user=request.user,
+        role='model',
+        message=bot_reply
+      )
+      
+      return Response({"bot_reply": bot_reply}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      # Delete the user message from the database on failure
+      user_message_obj.delete()
+
+      error_message = str(e)
+      user_friendly_message = "An unexpected error occurred. Please try again later."
+      
+      for key, value in error_map.items():
+        if key in error_message.lower():
+          user_friendly_message = value
+          break
+
+      print(f"Error calling Gemini API for chatbot: {error_message}")
+      return Response({"detail": user_friendly_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+class ChatHistoryAPIView(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+  
+  def get(self, request, *args, **kwargs):
+    history = ChatHistory.objects.filter(user=request.user).order_by('timestamp')
+    
+    formatted_history = [
+      {"role": obj.role, "parts": [{"text": obj.message}]}
+      for obj in history
+    ]
+    
+    return Response(formatted_history, status=status.HTTP_200_OK)

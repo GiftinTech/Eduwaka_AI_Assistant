@@ -2,14 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   Search,
   BookOpen,
-  DollarSign,
   CheckCircle,
   GraduationCap,
-  Calendar,
-  Bell,
   HelpCircle,
   Bot,
-  MessageSquare,
   Info,
   Users,
 } from 'lucide-react';
@@ -26,28 +22,22 @@ const Features = () => {
     {
       icon: Search,
       title: 'Institution Search',
-      description: 'Find the perfect university',
+      description: 'Find top universities and colleges across Nigeria.',
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
     },
     {
       icon: BookOpen,
       title: 'Course Search',
-      description: 'Explore thousands of courses',
+      description: 'Discover courses, their requirements, and duration.',
       color: 'text-orange-500',
       bgColor: 'bg-orange-500/10',
     },
     {
-      icon: DollarSign,
-      title: 'Fee Checker',
-      description: 'Get accurate tuition estimates',
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
-    },
-    {
       icon: CheckCircle,
-      title: 'Eligibility Checker',
-      description: 'Check course qualification',
+      title: 'AI Eligibility Checker',
+      description:
+        'Check your eligibility for specific courses and institutions.',
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
     },
@@ -73,20 +63,6 @@ const Features = () => {
       bgColor: 'bg-rose-500/10',
     },
     {
-      icon: Calendar,
-      title: 'Admission Calendar',
-      description: 'Important dates & deadlines',
-      color: 'text-cyan-500',
-      bgColor: 'bg-cyan-500/10',
-    },
-    {
-      icon: Bell,
-      title: 'Email Notifications',
-      description: 'Get admission updates',
-      color: 'text-lime-500',
-      bgColor: 'bg-lime-500/10',
-    },
-    {
       icon: HelpCircle,
       title: 'Support Desk',
       description: '24/7 admission support',
@@ -99,13 +75,6 @@ const Features = () => {
       description: 'Instant AI-powered answers',
       color: 'text-amber-500',
       bgColor: 'bg-amber-500/10',
-    },
-    {
-      icon: MessageSquare,
-      title: 'FAQ Section',
-      description: 'Common admission questions',
-      color: 'text-fuchsia-500',
-      bgColor: 'bg-fuchsia-500/10',
     },
   ];
 
@@ -120,12 +89,12 @@ const Features = () => {
   const FeatureCard: React.FC<{ feature: Feature }> = ({ feature }) => {
     const IconComponent = feature.icon;
     return (
-      <div className="group relative flex-shrink-0 transform rounded-2xl border border-gray-200/20 bg-white/60 p-6 text-center shadow-md backdrop-blur-md transition-all duration-500 hover:-translate-y-3 hover:shadow-xl dark:border-gray-700/40 dark:bg-gray-800/50">
+      <div className="group relative flex-shrink-0 rounded-2xl border border-gray-200/20 bg-white/60 p-6 text-center shadow-sm backdrop-blur-md hover:shadow-xl dark:border-gray-700/40 dark:bg-gray-800/50">
         {/* subtle gradient highlight on hover */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-blue-200/20 to-purple-200/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-blue-900/10 dark:to-purple-900/10" />
 
         <div
-          className={`relative z-10 h-14 w-14 rounded-2xl ${feature.bgColor} mx-auto mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+          className={`relative z-10 h-14 w-14 rounded-2xl ${feature.bgColor} mx-auto mb-5 flex items-center justify-center`}
         >
           <IconComponent className={`h-7 w-7 ${feature.color}`} />
         </div>
@@ -144,18 +113,6 @@ const Features = () => {
       id="features"
       className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-100 py-24 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
     >
-      {/* wavy top edge */}
-      {/* <div className="absolute left-0 top-0 w-full overflow-hidden">
-        <svg
-          className="relative block h-20 w-full fill-white dark:fill-gray-900"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,0 C300,80 900,80 1200,0 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div> */}
-
       <div className="container relative z-10 mx-auto px-6 sm:px-8">
         <div className="mb-10 text-center">
           <h2 className="mb-4 text-4xl font-extrabold text-gray-900 dark:text-white">
@@ -181,7 +138,7 @@ const Features = () => {
           <Button
             variant="hero"
             size="lg"
-            className="rounded-full px-8 py-4 shadow-lg"
+            className="!rounded-full px-8 py-4 shadow-lg"
           >
             <Users className="mr-2 h-5 w-5" />
             Start Your Journey Today
