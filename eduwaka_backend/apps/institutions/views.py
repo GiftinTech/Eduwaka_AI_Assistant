@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.institutions.models import Institution
@@ -11,6 +11,8 @@ class InstitutionViewSet(viewsets.ModelViewSet):
   queryset = Institution.objects.all()
   serializer_class = InstitutionSerializer
   permission_classes = [IsAdminOrReadOnly] # Allow read-only for unauthenticated and authenticated. Only admin can perform CUD ops.
+  filter_backends = [filters.SearchFilter]
+  search_fields = ['name', 'state', 'ownership_type']
 
   def get_queryset(self):
     # This line initializes the queryset with all objects from the model
