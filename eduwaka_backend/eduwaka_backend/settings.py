@@ -32,14 +32,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+# dev test
+# DEBUG = True
+
+# ALLOWED_HOSTS = [
+#     "localhost",
+#     "127.0.0.1",
+#     "localhost:5174",
+#     "127.0.0.1:8000",
+# ]
+
+# Prod
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
-    "http://localhost:5174", # React frontend's local address
-    "http://127.0.0.1:8000",
+    "eduwaka-ai-assistant.onrender.com", # React frontend's live address
 ]
-
 
 # Application definition
 
@@ -63,10 +72,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -195,17 +204,6 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
-]
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # Check for softdelete status in backends.py
