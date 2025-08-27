@@ -1,4 +1,37 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+
+type CourseFees = {
+  [course: string]: string;
+  default: string;
+};
+
+type FeesData = {
+  [institution: string]: CourseFees;
+};
+
+const feesData: FeesData = {
+  'university of ibadan': {
+    medicine: 'N350,000 per session',
+    surgery: 'N350,000 per session',
+    law: 'N250,000 per session',
+    'computer science': 'N200,000 per session',
+    default: 'N180,000 - N250,000 per session (general estimate)',
+  },
+  'university of lagos': {
+    medicine: 'N300,000 per session',
+    surgery: 'N300,000 per session',
+    accounting: 'N150,000 per session',
+    default: 'N120,000 - N200,000 per session (general estimate)',
+  },
+  'federal university of technology, akure': {
+    engineering: 'N170,000 per session',
+    default: 'N100,000 - N150,000 per session (general estimate)',
+  },
+  'university of calabar': {
+    'social works': 'N80,000 - N120,000 per session',
+    default: 'N70,000 - N150,000 per session (general estimate for Unical)',
+  },
+};
 
 const TuitionFeeChecker = () => {
   const [institutionInput, setInstitutionInput] = useState<string>('');
@@ -8,56 +41,27 @@ const TuitionFeeChecker = () => {
   const handleCheckFees = () => {
     const lowerCaseInstitution = institutionInput.toLowerCase();
     const lowerCaseCourse = courseInput.toLowerCase();
-    let estimatedFee = 'N/A';
 
-    if (lowerCaseInstitution.includes('university of ibadan')) {
-      if (
-        lowerCaseCourse.includes('medicine') ||
-        lowerCaseCourse.includes('surgery')
-      ) {
-        estimatedFee = 'N350,000 per session';
-      } else if (lowerCaseCourse.includes('law')) {
-        estimatedFee = 'N250,000 per session';
-      } else if (lowerCaseCourse.includes('computer science')) {
-        estimatedFee = 'N200,000 per session';
-      } else {
-        estimatedFee = 'N180,000 - N250,000 per session (general estimate)';
-      }
-    } else if (lowerCaseInstitution.includes('university of lagos')) {
-      if (
-        lowerCaseCourse.includes('medicine') ||
-        lowerCaseCourse.includes('surgery')
-      ) {
-        estimatedFee = 'N300,000 per session';
-      } else if (lowerCaseCourse.includes('accounting')) {
-        estimatedFee = 'N150,000 per session';
-      } else {
-        estimatedFee = 'N120,000 - N200,000 per session (general estimate)';
-      }
-    } else if (
-      lowerCaseInstitution.includes('federal university of technology, akure')
-    ) {
-      if (lowerCaseCourse.includes('engineering')) {
-        estimatedFee = 'N170,000 per session';
-      } else {
-        estimatedFee = 'N100,000 - N150,000 per session (general estimate)';
-      }
-    } else if (lowerCaseInstitution.includes('university of calabar')) {
-      if (lowerCaseCourse.includes('social works')) {
-        estimatedFee = 'N80,000 - N120,000 per session'; // Mock fee for Social Works at UniCal
-      } else {
-        estimatedFee =
-          'N70,000 - N150,000 per session (general estimate for UniCal)';
-      }
-    } else {
+    let estimatedFee =
+      'Fees vary greatly by institution and course. Please check the official website.';
+
+    if (feesData[lowerCaseInstitution]) {
       estimatedFee =
-        'Fees vary greatly by institution and course. Please check the official website of ' +
-        (institutionInput || 'the institution') +
-        '.';
+        feesData[lowerCaseInstitution][lowerCaseCourse] ||
+        feesData[lowerCaseInstitution].default;
+    } else {
+      estimatedFee = `Fees vary greatly by institution and course. Please check the official website of ${institutionInput || 'the institution'}.`;
     }
+
     setFeeResult(
       `Estimated fee for ${courseInput || 'your chosen course'} at ${institutionInput || 'the specified institution'}: ${estimatedFee}`,
     );
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCheckFees();
+    }
   };
 
   return (
@@ -102,6 +106,7 @@ const TuitionFeeChecker = () => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCourseInput(e.target.value)
           }
+          onKeyDown={handleKeyDown}
         />
 
         <button
@@ -110,9 +115,23 @@ const TuitionFeeChecker = () => {
         >
           Check Fees
         </button>
+
         {feeResult && (
           <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
             <p className="text-gray-600">{feeResult}</p>
+            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+              <p className="text-red-600">
+                ⚠ <span className="font-bold">Note:</span> This result may not
+                be accurate. Always confirm from the institution's website as
+                fees are bound to change every session.
+              </p>
+            </div>
+            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+              <p className="text-gray-800">
+                ℹ <span className="font-bold">Info:</span> More institution
+                will be covered soon. This is just an MVP.
+              </p>
+            </div>
           </div>
         )}
       </div>

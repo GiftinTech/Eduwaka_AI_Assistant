@@ -23,6 +23,7 @@ interface DjangoUser {
 // Shape of the AuthContext value
 interface AuthContextType {
   user: DjangoUser | null;
+  token: string | null;
   loadingAuth: boolean;
   appError: string;
   handleSignup: (
@@ -56,6 +57,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<DjangoUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [appError, setAppError] = useState<string>('');
 
@@ -128,6 +130,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const accessToken = localStorage.getItem('access_token');
       if (accessToken) {
         const decodedToken = decodeJwt(accessToken);
+        setToken(decodedToken);
         if (decodedToken) {
           // Fetch full user profile using the token
           await fetchUserProfile(accessToken);
@@ -210,6 +213,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         const decodedToken = decodeJwt(data.access);
+        setToken(decodedToken);
         if (decodedToken) {
           // Fetch the full user profile after getting the token
           await fetchUserProfile(data.access);
@@ -346,6 +350,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const contextValue: AuthContextType = {
     user,
+    token,
     loadingAuth,
     appError,
     handleSignup,

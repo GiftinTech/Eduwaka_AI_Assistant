@@ -204,7 +204,7 @@ const UserProfile = () => {
       <p className="mb-4 text-gray-700">
         Manage your personal information and saved data.
       </p>
-      {user && (
+      {!profile?.photo && (
         <Button
           variant="secondary"
           className="mb-4"
@@ -330,7 +330,12 @@ const UserProfile = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="-mb-4 flex justify-between">
+            <img
+              src={profile?.photo}
+              alt={profile?.username}
+              className="h-28 w-28 rounded-full"
+            />
+            <div className="flex justify-between">
               <p className="text-gray-700">
                 <span className="font-medium">Username:</span>{' '}
                 {profile?.username || 'N/A'}

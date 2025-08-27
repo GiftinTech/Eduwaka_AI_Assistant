@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type ChangeEvent } from 'react';
 
-interface Institution {
+export interface Institution {
   id: string;
   name: string;
   ownership_type: string;
@@ -10,7 +10,7 @@ interface Institution {
   website: string;
 }
 
-interface InstitutionResponse {
+export interface InstitutionResponse {
   results: Institution[];
   count: number;
   next: string | null;

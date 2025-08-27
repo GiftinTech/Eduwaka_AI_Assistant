@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { Upload } from 'lucide-react';
-import { useState, type ChangeEvent } from 'react';
+import type { Institution, InstitutionResponse } from './SearchInstitutions';
 
 interface AnalysisResult {
-  is_eligible: boolean; // Changed from isEligible to match potential snake_case from backend
+  is_eligible: boolean;
   reasons: string[];
-  missing_requirements: string[]; // Changed from missingRequirements
-  suggested_courses: string[]; // Changed from suggestedCourses
-  o_level_credits_required: number; // Changed from oLevelCreditsRequired
-  o_level_sittings_accepted: number; // Changed from oLevelSittingsAccepted
+  missing_requirements: string[];
+  suggested_courses: string[];
+  o_level_credits_required: number;
+  o_level_sittings_accepted: number;
 }
 
 const EligibilityCheckerAI = () => {
@@ -18,22 +19,48 @@ const EligibilityCheckerAI = () => {
   const [jambSubjects, setJambSubjects] = useState<string>('');
   const [oLevelSittings, setOLevelSittings] = useState<string>('1'); // Default to 1 sitting
   const [desiredCourse, setDesiredCourse] = useState<string>('');
-  const [institutionName, setInstitutionName] = useState<string>(''); // New state for institution
+  const [institutionName, setInstitutionName] = useState<string>('');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null,
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
+  const [institutionResults, setInstitutionResults] = useState<Institution[]>(
+    [],
+  );
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  // Function to get the JWT token from local storage (or wherever it's stored)
+  const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
   const getAuthToken = (): string | null => {
-    // In a real application, you'd retrieve the JWT token from secure storage (e.g., localStorage, sessionStorage)
-    // For this example, we'll assume it's stored in localStorage after login.
-    // Replace with your actual token retrieval logic if different.
-    return localStorage.getItem('access_token'); // Assuming 'access_token' is where your JWT is stored
+    return localStorage.getItem('access_token');
   };
+
+  // fetch matching institutions
+  useEffect(() => {
+    const fetchInstitutions = async () => {
+      if (institutionName.trim().length < 2) {
+        setInstitutionResults([]);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `${DJANGO_API_BASE_URL}institutions/?search=${institutionName}`,
+        );
+        const data: InstitutionResponse = await response.json();
+        setInstitutionResults(data.results || []);
+        setShowDropdown(true);
+      } catch (err) {
+        console.error('Error fetching institutions:', err);
+      }
+    };
+
+    const delayDebounce = setTimeout(() => {
+      fetchInstitutions();
+    }, 400); // debounce typing
+
+    return () => clearTimeout(delayDebounce);
+  }, [institutionName, DJANGO_API_BASE_URL]);
 
   const handleAnalyze = async () => {
     // Basic validation
@@ -68,10 +95,9 @@ const EligibilityCheckerAI = () => {
     setLoading(true);
     setError('');
     setAnalysisResult(null);
-
     const authToken = getAuthToken();
     if (!authToken) {
-      setError('Authentication token not found. Please log in.');
+      setError('Please log in to use the Eligibility Checker.');
       setLoading(false);
       return;
     }
@@ -87,16 +113,17 @@ const EligibilityCheckerAI = () => {
     };
 
     try {
-      // Make the request to your Django backend
-      const response = await fetch(`${DJANGO_API_BASE_URL}eligibility-check/`, {
-        // Adjust URL as needed
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`, // Include JWT token
+      const response = await fetch(
+        `${DJANGO_API_BASE_URL}ai/eligibility-check/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(requestBody),
         },
-        body: JSON.stringify(requestBody),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -111,7 +138,8 @@ const EligibilityCheckerAI = () => {
       setAnalysisResult(result as AnalysisResult);
     } catch (err: any) {
       console.error('Error during eligibility analysis:', err);
-      setError(
+      setError(`Failed to analyze. Please ensure you are logged in.`);
+      console.log(
         `Failed to analyze: ${err.message}. Please ensure your backend is running and you are logged in.`,
       );
     } finally {
@@ -147,7 +175,29 @@ const EligibilityCheckerAI = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setInstitutionName(e.target.value)
             }
+            onFocus={() =>
+              institutionResults.length > 0 && setShowDropdown(true)
+            }
+            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           />
+
+          {/* Suggestions dropdown */}
+          {showDropdown && institutionResults.length > 0 && (
+            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg">
+              {institutionResults.map((inst) => (
+                <li
+                  key={inst.id}
+                  onMouseDown={() => {
+                    setInstitutionName(inst.name);
+                    setShowDropdown(false);
+                  }}
+                  className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                >
+                  {inst.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div>
           <label
