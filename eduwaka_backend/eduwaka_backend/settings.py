@@ -34,7 +34,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # dev test
-# DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = [
 #     "localhost",
@@ -187,6 +187,7 @@ REST_FRAMEWORK = {
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "https://eduwaka-ai-assistant-server.onrender.com", #backend live address
     "http://localhost:5174", # React frontend's local address
     "http://127.0.0.1:8000",
 ]

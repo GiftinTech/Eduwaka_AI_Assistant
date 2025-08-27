@@ -148,7 +148,7 @@ const Header = () => {
                   <>
                     <Button
                       variant="outline"
-                      className="mr-2 mt-4 border font-semibold"
+                      className="mr-2 border font-semibold"
                       onClick={() => {
                         navigate('/login');
                         setIsMenuOpen(false);

@@ -210,6 +210,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log('Login successful!', data);
+
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         const decodedToken = decodeJwt(data.access);
