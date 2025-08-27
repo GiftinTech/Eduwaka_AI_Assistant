@@ -47,7 +47,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = False
 
 ALLOWED_HOSTS = [
+    "eduwaka-ai-assistant-server.onrender.com",
     "eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "localhost",
+    "127.0.0.1",
 ]
 
 # Application definition
@@ -174,7 +177,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication', # Optional, for browsable API
+        # 'rest_framework.authentication.SessionAuthentication', # Optional, for browsable API
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated', # Default to requiring authentication
@@ -187,7 +190,6 @@ REST_FRAMEWORK = {
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
-    "https://eduwaka-ai-assistant-server.onrender.com", #backend live address
     "http://localhost:5174", # React frontend's local address
     "http://127.0.0.1:8000",
 ]
