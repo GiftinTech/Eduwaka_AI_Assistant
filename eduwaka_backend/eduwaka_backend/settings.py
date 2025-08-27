@@ -32,9 +32,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "http://localhost:5174", # React frontend's local address
+    "http://127.0.0.1:8000",
+]
 
 
 # Application definition
@@ -173,10 +177,9 @@ REST_FRAMEWORK = {
 
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
-    "https://eduwaka-ai-assistant.onrender.com",
-    "http://localhost:5174", # React frontend's address
-    "http://127.0.0.1:3000",
-    # Prod frontend URL when deployed
+    "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "http://localhost:5174", # React frontend's local address
+    "http://127.0.0.1:8000",
 ]
 
 # Allow eduwaka_frontend to send cookies and auth headers
