@@ -1,4 +1,4 @@
 *.env
-*.txt
+university_courses.txt
 *.json
 dev-data
