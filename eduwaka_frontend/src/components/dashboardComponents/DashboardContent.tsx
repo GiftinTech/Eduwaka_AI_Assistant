@@ -39,7 +39,7 @@ const DashboardContent = () => {
         <span className="text-pink-600 dark:text-pink-400">Waka!</span>
       </h2>
       <p className="mb-8 text-lg text-gray-700">
-        Your personalized guide to university admissions in Nigeria.
+        Your AI powered guide to university admissions in Nigeria.
       </p>
 
       <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-3">
