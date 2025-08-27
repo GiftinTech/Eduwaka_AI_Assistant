@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   BookOpen,
@@ -13,12 +13,6 @@ import Button from './ui/button';
 import { Link } from 'react-router-dom';
 
 const Features = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
-
   const features = [
     {
       icon: Search,
@@ -87,22 +81,104 @@ const Features = () => {
     bgColor: string;
   };
 
-  const FeatureCard: React.FC<{ feature: Feature }> = ({ feature }) => {
+  // --- Header Animation ---
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  useEffect(() => {
+    const element = headerRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setHeaderVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(element);
+    return () => {
+      if (element) observer.unobserve(element);
+    };
+  }, []);
+
+  // --- Button Animation ---
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const [buttonVisible, setButtonVisible] = useState(false);
+
+  useEffect(() => {
+    const element = buttonRef.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setButtonVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(element);
+    return () => {
+      if (element) observer.unobserve(element);
+    };
+  }, []);
+
+  // --- Feature Card ---
+  const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({
+    feature,
+    index,
+  }) => {
     const IconComponent = feature.icon;
+    const ref = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+      const element = ref.current;
+      if (!element) return;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisible(true);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(element);
+      return () => {
+        if (element) observer.unobserve(element);
+      };
+    }, []);
+
     return (
-      <div className="group relative flex-shrink-0 rounded-2xl border border-gray-200/20 bg-white/60 p-6 text-center shadow-sm backdrop-blur-md hover:shadow-xl dark:border-gray-700/40 dark:bg-gray-800/50">
-        {/* subtle gradient highlight on hover */}
+      <div
+        ref={ref}
+        className={`group relative flex-shrink-0 rounded-2xl border border-gray-200/20 bg-white/60 p-6 text-center shadow-sm backdrop-blur-md transition-all duration-700 ease-out hover:shadow-xl dark:border-gray-700/40 dark:bg-gray-800/50 ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        style={{ transitionDelay: `${index * 100}ms` }}
+      >
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-blue-200/20 to-purple-200/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:from-blue-900/10 dark:to-purple-900/10" />
 
         <div
-          className={`relative z-10 h-14 w-14 rounded-2xl ${feature.bgColor} mx-auto mb-5 flex items-center justify-center`}
+          className={`relative z-10 h-14 w-14 rounded-2xl ${feature.bgColor} mx-auto mb-5 flex items-center justify-center transition-all duration-700 ${visible ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}
         >
           <IconComponent className={`h-7 w-7 ${feature.color}`} />
         </div>
-        <h3 className="relative z-10 mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <h3
+          className={`relative z-10 mb-2 text-lg font-semibold text-gray-900 transition-all duration-700 dark:text-gray-100 ${visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'}`}
+        >
           {feature.title}
         </h3>
-        <p className="relative z-10 text-sm text-gray-600 dark:text-gray-300">
+        <p
+          className={`relative z-10 text-sm text-gray-600 transition-all duration-700 dark:text-gray-300 ${visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'}`}
+        >
           {feature.description}
         </p>
       </div>
@@ -115,7 +191,11 @@ const Features = () => {
       className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-100 py-24 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
     >
       <div className="container relative z-10 mx-auto px-6 sm:px-8">
-        <div className="mb-10 text-center">
+        {/* Header */}
+        <div
+          ref={headerRef}
+          className={`mb-10 transform text-center transition-all duration-700 ease-out ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
           <h2 className="mb-4 text-4xl font-extrabold text-gray-900 dark:text-white">
             Everything You Need for University Admission
           </h2>
@@ -125,17 +205,22 @@ const Features = () => {
           </p>
         </div>
 
-        <div
-          className={`mx-auto grid max-w-5xl grid-cols-2 place-content-center gap-6 transition-all duration-1000 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
-            isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-          }`}
-        >
+        {/* Features */}
+        <div className="mx-auto grid max-w-5xl grid-cols-2 place-content-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {features.map((feature, index) => (
-            <FeatureCard key={`feature-${index}`} feature={feature} />
+            <FeatureCard
+              key={`feature-${index}`}
+              feature={feature}
+              index={index}
+            />
           ))}
         </div>
 
-        <div className="mt-20 text-center">
+        {/* Button */}
+        <div
+          ref={buttonRef}
+          className={`mt-20 transform text-center transition-all duration-700 ease-out ${buttonVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
           <Button
             variant="hero"
             size="lg"

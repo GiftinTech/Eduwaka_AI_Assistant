@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from './ui/button';
 import { Minus, Plus } from 'lucide-react';
 
@@ -53,10 +53,75 @@ const FAQ = () => {
     setOpenItem(openItem === value ? null : value);
   };
 
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  useEffect(() => {
+    const element = headerRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setHeaderVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 },
+    );
+
+    observer.observe(element);
+    return () => {
+      if (element) observer.unobserve(element);
+    };
+  }, []);
+
+  const faqRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [visibleItems, setVisibleItems] = useState<boolean[]>(
+    Array(faqs.length).fill(false),
+  );
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    faqRefs.current.forEach((el, index) => {
+      if (!el) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleItems((prev) => {
+                const newState = [...prev];
+                newState[index] = true;
+                return newState;
+              });
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 },
+      );
+
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect());
+    };
+  }, [faqs.length]);
+
   return (
     <section className="font-inter relative bg-gray-100 py-16 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 text-center">
+        {/* Header */}
+        <div
+          ref={headerRef}
+          className={`mb-12 transform text-center transition-all duration-700 ease-out ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
           <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl">
             Frequently Asked Questions
           </h2>
@@ -66,6 +131,7 @@ const FAQ = () => {
           </p>
         </div>
 
+        {/* FAQ Items */}
         <div className="mx-auto max-w-3xl">
           <div className="space-y-4">
             {faqs.map((faq, index) => {
@@ -75,7 +141,11 @@ const FAQ = () => {
               return (
                 <div
                   key={index}
-                  className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700"
+                  ref={(el) => {
+                    faqRefs.current[index] = el;
+                  }}
+                  className={`transform rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-700 ease-out dark:border-gray-600 dark:bg-gray-700 ${visibleItems[index] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
                 >
                   <Button
                     variant="outline"
@@ -88,19 +158,14 @@ const FAQ = () => {
                     <span className="text-gray-700 dark:text-gray-100">
                       {faq.question}
                     </span>
-
                     {isOpen ? <Minus /> : <Plus />}
                   </Button>
-                  {/* Accordion Content */}
+
                   <div
                     id={`accordion-content-${index}`}
                     role="region"
                     aria-labelledby={`accordion-trigger-${index}`}
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      isOpen
-                        ? 'max-h-screen pt-0.5 opacity-100'
-                        : 'max-h-0 opacity-0'
-                    }`}
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen pt-0.5 opacity-100' : 'max-h-0 opacity-0'}`}
                   >
                     <div className="p-4 pt-2 text-gray-700 dark:text-gray-300">
                       {faq.answer}
