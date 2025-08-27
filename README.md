@@ -5,6 +5,11 @@ It provides tools to search institutions, explore courses, check eligibility, es
 
 ---
 
+**Frontend link**: [https://eduwaka-ai-assistant.onrender.com/dashboard](https://eduwaka-ai-assistant.onrender.com/dashboard)
+**API Server**: [https://eduwaka-ai-assistant-server.onrender.com/api/](https://eduwaka-ai-assistant-server.onrender.com/api/)
+
+---
+
 ## 🚀 Tech Stack
 
 ### Frontend
