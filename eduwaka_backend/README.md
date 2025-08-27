@@ -5,6 +5,10 @@ The backend is built with **Python + Django** and provides RESTful APIs for auth
 
 ---
 
+**Live API**: [https://eduwaka-ai-assistant-server.onrender.com/api/](https://eduwaka-ai-assistant-server.onrender.com/api/)
+
+---
+
 ## 🚀 Tech Stack
 
 - **Language:** Python 3.11+
