@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Button from './ui/button';
+import { Minus, Plus } from 'lucide-react';
 
 const FAQ = () => {
   const [openItem, setOpenItem] = useState<string | null>(null);
@@ -49,24 +50,11 @@ const FAQ = () => {
 
   // Handler to toggle the open state of an accordion item
   const handleToggle = (value: string) => {
-    // If the clicked item is already open, close it. Otherwise, open the clicked item.
     setOpenItem(openItem === value ? null : value);
   };
 
   return (
     <section className="font-inter relative bg-gray-100 py-16 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
-      {/* Curved top edge */}
-      {/* <div className="absolute left-0 top-0 w-full overflow-hidden">
-        <svg
-          className="relative block h-20 w-full fill-current text-white dark:text-gray-900" // Use fill-current and specify color
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,60 C300,0 900,120 1200,60 L1200,0 L0,0 Z"></path>
-        </svg>
-      </div> */}
-
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-gray-100 md:text-4xl">
@@ -79,7 +67,6 @@ const FAQ = () => {
         </div>
 
         <div className="mx-auto max-w-3xl">
-          {/* Custom Accordion structure */}
           <div className="space-y-4">
             {faqs.map((faq, index) => {
               const itemValue = `item-${index}`;
@@ -101,18 +88,8 @@ const FAQ = () => {
                     <span className="text-gray-700 dark:text-gray-100">
                       {faq.question}
                     </span>
-                    <svg
-                      className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
+
+                    {isOpen ? <Minus /> : <Plus />}
                   </Button>
                   {/* Accordion Content */}
                   <div

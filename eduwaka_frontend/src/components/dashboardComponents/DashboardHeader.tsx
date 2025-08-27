@@ -1,14 +1,17 @@
 // Lucide React Icons
-import { Menu, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+import { Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Button from '../ui/button';
 
 interface DashboardHeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
 const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
-  const { user } = useAuth(); // Get user from context
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -31,17 +34,18 @@ const DashboardHeader = ({ setIsSidebarOpen }: DashboardHeaderProps) => {
           onClick={() => navigate('/dashboard/myProfile')}
           className="flex items-center gap-2"
         >
-          {user?.photo ? (
+          {user?.photo && (
             <img
               src={user?.photo}
               alt="User"
               className="h-8 w-8 rounded-full object-cover"
             />
-          ) : (
-            <User size={20} />
           )}
         </button>
       </div>
+      <Button variant="link" className="flex items-center gap-2">
+        <Link to="/"> Back to Home</Link>
+      </Button>
     </header>
   );
 };

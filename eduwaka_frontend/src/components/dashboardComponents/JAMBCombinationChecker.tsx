@@ -1,11 +1,11 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
 
 const JAMBCombinationChecker = () => {
   const [courseName, setCourseName] = useState<string>('');
   const [combinationResult, setCombinationResult] = useState<string>('');
 
   const handleCheckCombination = () => {
-    // Simple mock logic for demonstration
+    // Simple mock logic for first MVP
     const lowerCaseCourse = courseName.toLowerCase();
     if (
       lowerCaseCourse.includes('medicine') ||
@@ -30,6 +30,12 @@ const JAMBCombinationChecker = () => {
       setCombinationResult(
         "No specific JAMB combination found for this course in our mock data. Please consult the institution's official brochure.",
       );
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCheckCombination();
     }
   };
 
@@ -58,6 +64,7 @@ const JAMBCombinationChecker = () => {
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCourseName(e.target.value)
           }
+          onKeyDown={handleKeyDown}
         />
         <button
           onClick={handleCheckCombination}
@@ -68,6 +75,12 @@ const JAMBCombinationChecker = () => {
         {combinationResult && (
           <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
             <p className="text-gray-600">{combinationResult}</p>
+            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+              <p className="text-gray-800">
+                ℹ <span className="font-bold">Info:</span> More combinations
+                will be covered soon. This is just an MVP.
+              </p>
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
-import { ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import Button from '../ui/button';
+import { Minus, Plus } from 'lucide-react';
 
 interface FAQItemProps {
   question: string;
@@ -17,9 +17,7 @@ const FAQItem = ({ question, answer }: FAQItemProps) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{question}</span>
-        <ChevronRight
-          className={`transform transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
-        />
+        {isOpen ? <Minus /> : <Plus />}
       </Button>
       {isOpen && (
         <div className="p-4 pt-0 text-gray-600">

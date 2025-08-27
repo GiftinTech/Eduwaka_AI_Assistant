@@ -10,6 +10,7 @@ import {
   Users,
 } from 'lucide-react';
 import Button from './ui/button';
+import { Link } from 'react-router-dom';
 
 const Features = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -140,8 +141,10 @@ const Features = () => {
             size="lg"
             className="!rounded-full px-8 py-4 shadow-lg"
           >
-            <Users className="mr-2 h-5 w-5" />
-            Start Your Journey Today
+            <Link to="/signup" className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Start Your Journey Today
+            </Link>
           </Button>
         </div>
       </div>

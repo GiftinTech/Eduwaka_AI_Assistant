@@ -5,14 +5,89 @@ import json
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.ai_assistant.serializers import EligibilityCheckRequestSerializer, ChatbotRequestSerializer 
+from apps.ai_assistant.serializers import EligibilityCheckRequestSerializer, ChatbotRequestSerializer, InstitutionRequestSerializer
 from .models import ChatHistory
 
-# Configure Gemini API with the key from settings
+# Configure Gemini API with the key using the settings settings
 genai.configure(api_key=settings.GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-2.5-flash") 
+# Initialize the Gemini model for content generation
+model = genai.GenerativeModel("gemini-2.5-flash")
 
-# Create your views here.
+# Institution Overview View
+class InstitutionOverviewAPIView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def post(self, request, *args, **kwargs):
+    # Validate the incoming data using the serializer
+    serializer = InstitutionRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    institution_name = serializer.validated_data['institution_name']
+
+    # Detailed prompt for the Gemini model, requesting JSON output
+    prompt = f"""
+    Provide a concise overview of the Nigerian institution named "{institution_name}".
+    The overview should be structured as a JSON object with the following fields:
+    - "name": The full name of the institution.
+    - "type": The type of institution (e.g., "Federal University", "State Polytechnic", "Private University").
+    - "location": The city and state where the main campus is located.
+    - "established_year": The year it was founded.
+    - "overview": A brief, one-paragraph summary of the institution's history and mission.
+    - "relevance": A short description of what the institution is known for (e.g., academic excellence, specific faculties, or campus life).
+    
+    If the institution is not a recognized Nigerian tertiary institution, return a JSON object with an "error" field.
+
+    Example JSON response for a valid institution:
+    {{
+      "name": "University of Lagos",
+      "type": "Federal University",
+      "location": "Lagos, Lagos State",
+      "established_year": 1962,
+      "overview": "The University of Lagos, founded in 1962, is a leading research university. It is one of the nation's first generation universities and is known for its academic and social influence.",
+      "relevance": "UNILAG is well-regarded for its business and law faculties, and is one of the most prestigious universities in Nigeria."
+    }}
+
+    Example JSON response for an invalid institution:
+    {{
+      "error": "The institution '{institution_name}' could not be found or is not a recognized Nigerian institution."
+    }}
+    """
+
+    try:
+      # Call Gemini API with the prompt
+      response = model.generate_content(
+        contents=[{"parts": [{"text": prompt}]}],
+        generation_config={
+          "response_mime_type": "application/json",
+        }
+      )
+
+      # Parse the JSON response from the model
+      gemini_output_text = response.text
+      institution_data = json.loads(gemini_output_text)
+
+      # Check for a specific error from the AI model
+      if "error" in institution_data:
+        return Response(
+          {"detail": institution_data["error"]},
+          status=status.HTTP_404_NOT_FOUND
+        )
+
+      return Response(institution_data, status=status.HTTP_200_OK)
+
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from Gemini API: {response.text}")
+        return Response(
+            {"detail": "An unexpected error occurred while parsing the AI response."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    except Exception as e:
+        print(f"Error calling Gemini API for institution overview: {e}")
+        return Response(
+            {"detail": f"An unexpected error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+# Eligibility View
 class EligibilityCheckAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated] # Only authenticated users can use this
 
@@ -101,6 +176,7 @@ class EligibilityCheckAPIView(APIView):
       print(f"Error calling Gemini API: {e}")
       return Response({"detail": f"Error processing eligibility check: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+# Chatbot View
 class ChatbotAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated]
 

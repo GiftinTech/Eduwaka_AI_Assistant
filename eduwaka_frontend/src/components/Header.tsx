@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Button from './ui/button';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -47,20 +47,24 @@ const Header = () => {
           <div className="hidden items-center space-x-4 md:flex">
             {user ? (
               <>
-                <Button
-                  variant="hero"
-                  className="font-semibold"
-                  onClick={() => navigate('/dashboard')}
+                <button
+                  onClick={() => {
+                    navigate('/dashboard');
+                  }}
                 >
-                  <User className="mr-2 h-4 w-4" />
-                  {user.username || 'User'} Profile
-                </Button>
+                  {user?.photo && (
+                    <img
+                      src={user?.photo}
+                      alt="User"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  )}
+                </button>
                 <Button
                   variant="outline"
-                  className="border font-semibold"
+                  className="border font-semibold hover:text-red-600"
                   onClick={handleLogout}
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </Button>
               </>
@@ -111,29 +115,32 @@ const Header = () => {
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-4 border-t border-border pt-4">
+              <div className="mt-4 flex items-center gap-2 border-t border-border pt-4">
                 {user ? (
                   <>
-                    <Button
-                      variant="hero"
-                      className="mr-2 mt-4 font-semibold"
+                    <button
                       onClick={() => {
                         navigate('/dashboard');
                         setIsMenuOpen(false);
                       }}
                     >
-                      <User className="mr-2 h-4 w-4" />
-                      {user.username || 'User'} Profile
-                    </Button>
+                      {user?.photo && (
+                        <img
+                          src={user?.photo}
+                          alt="User"
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      )}
+                    </button>
+
                     <Button
                       variant="outline"
-                      className="ml-2 border font-semibold"
+                      className="ml-2 border font-semibold hover:text-red-600"
                       onClick={() => {
                         handleLogout();
                         setIsMenuOpen(false);
                       }}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </Button>
                   </>

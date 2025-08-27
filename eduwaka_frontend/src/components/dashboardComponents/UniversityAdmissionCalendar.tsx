@@ -28,6 +28,12 @@ const UniversityAdmissionCalendar = () => (
         </li>
       </ul>
     </div>
+    <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+      <p className="text-gray-700">
+        ℹ <span className="font-bold">Info:</span> More details will be covered
+        soon. This is just an MVP.
+      </p>
+    </div>
   </div>
 );
 

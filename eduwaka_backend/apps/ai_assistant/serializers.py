@@ -1,5 +1,9 @@
 from rest_framework import serializers
 
+
+class InstitutionRequestSerializer(serializers.Serializer):
+  institution_name = serializers.CharField(max_length=255)
+
 class EligibilityCheckRequestSerializer(serializers.Serializer):
   """
   Serializer for validating incoming data for the EligibilityCheckAPIView.

@@ -19,7 +19,6 @@ const EmailNotifications = () => (
         id="notificationEmail"
         placeholder="your_email@example.com"
         className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-        // You might want to add state and onChange handler here if this input is interactive
       />
       <button className="w-full rounded-lg bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700">
         Subscribe for Updates
@@ -27,6 +26,12 @@ const EmailNotifications = () => (
       <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
         <p className="text-gray-600">
           You will receive notifications based on your preferences.
+        </p>
+      </div>
+      <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+        <p className="text-gray-700">
+          ℹ <span className="font-bold">Info:</span> Feature coming soon...
+          This is just an MVP.
         </p>
       </div>
     </div>
