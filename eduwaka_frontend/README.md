@@ -12,7 +12,7 @@ The frontend is built with **React, TypeScript, TailwindCSS and Vite**.
 - **Vite (for bundling)**
 - **Tailwind CSS** for styling
 - **React Router v6** for routing
-- **Axios** for API calls
+- **Fetch** for API calls
 - **JWT-based auth** (protected routes)
 
 ---
