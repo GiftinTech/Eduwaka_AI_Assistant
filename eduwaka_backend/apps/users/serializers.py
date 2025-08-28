@@ -34,13 +34,13 @@ class RegisterSerializer(serializers.ModelSerializer):
     return super().create(validated_data)
 
 class UserProfileSerializer(serializers.ModelSerializer):
-  photo = serializers.SerializerMethodField()
+  photo_url = serializers.SerializerMethodField(read_only=True)
 
   class Meta:
     model = UserProfile
-    fields = ('id', 'username', 'email', 'first_name', 'last_name', 'photo')
+    fields = ('id', 'username', 'email', 'first_name', 'last_name', 'photo', 'photo_url')
 
-  def get_photo(self, obj):
+  def get_photo_url(self, obj):
     if obj.photo:
       request = self.context.get('request')
       if request:

@@ -143,7 +143,7 @@ const Chatbot = () => {
         Ask me questions like "Can I study Medicine with these subjects?" or
         "What are the requirements for Computer Science at UNILAG?".
       </p>
-      <div className="flex h-96 flex-col rounded-lg border border-gray-200 bg-gray-50 p-4">
+      <div className="flex h-[63vh] flex-col rounded-lg border border-gray-200 bg-gray-50 p-4 sm:h-96">
         <div className="custom-scrollbar mb-4 flex-1 space-y-3 overflow-y-auto p-2">
           {messages.length === 0 && (
             <div className="mt-10 text-center text-gray-500">

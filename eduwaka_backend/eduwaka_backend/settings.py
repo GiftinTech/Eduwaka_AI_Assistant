@@ -22,8 +22,8 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_URL = '/mediafiles/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,7 +35,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 
 # dev test
-# DEBUG = False
+# DEBUG = True
 
 # ALLOWED_HOSTS = [
 #     "localhost",
@@ -46,13 +46,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Prod
 DEBUG = False
+ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = [
-    "eduwaka-ai-assistant-server.onrender.com",
-    "eduwaka-ai-assistant.onrender.com", # React frontend's live address
-    "localhost",
-    "127.0.0.1",
-]
+# ALLOWED_HOSTS = [
+#     "eduwaka-ai-assistant-server.onrender.com",
+#     "eduwaka-ai-assistant.onrender.com", # React frontend's live address
+#     "localhost:5173",
+#     "127.0.0.1",
+# ]
 
 # Application definition
 
@@ -127,10 +128,9 @@ else:
             'PASSWORD': os.getenv('DATABASE_PASSWORD'),
             'HOST': os.getenv('DATABASE_HOST'),
             'PORT': os.getenv('DATABASE_PORT'),
+            'CONN_MAX_AGE': 600, 
         }
     }
-
-SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Gemini API Key
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
@@ -198,11 +198,12 @@ REST_FRAMEWORK = {
 }
 
 # CORS Headers Config
-CORS_ALLOWED_ORIGINS = [
-    "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
-    "http://localhost:5173", # React frontend's local address
-    "http://127.0.0.1:8000",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+#     "http://localhost:5173", # React frontend's local address
+#     "http://127.0.0.1:8000",
+# ]
 
 # Allow eduwaka_frontend to send cookies and auth headers
 CORS_ALLOW_CREDENTIALS = True

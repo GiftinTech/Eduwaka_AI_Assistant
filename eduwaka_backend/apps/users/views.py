@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.parsers import MultiPartParser, FormParser
 
 User = get_user_model()
 
@@ -128,6 +129,8 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
   serializer_class = UserProfileSerializer
   permission_classes = [permissions.IsAuthenticated]
 
+  parser_classes = (MultiPartParser, FormParser)
+
   def get_queryset(self):
     # Allow users to only see/edit their own profile
     if self.request.user.is_authenticated:
@@ -142,7 +145,9 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     
     elif request.method in ['PUT', 'PATCH']:
       serializer = self.get_serializer(request.user, data=request.data, partial=True)
+      print(request.data)
       serializer.is_valid(raise_exception=True)
+      print(serializer.validated_data)
       serializer.save()
       return Response(serializer.data)
     

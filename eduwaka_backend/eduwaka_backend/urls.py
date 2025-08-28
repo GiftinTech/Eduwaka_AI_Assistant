@@ -27,9 +27,5 @@ urlpatterns = [
     path('api/', include('apps.courses.urls')),
     path('api/', include('apps.institutions.urls')),
     path('api/ai/', include('apps.ai_assistant.urls')),
-    path('', RedirectView.as_view(url='/api/'))
-]
-
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', RedirectView.as_view(url='/api/')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

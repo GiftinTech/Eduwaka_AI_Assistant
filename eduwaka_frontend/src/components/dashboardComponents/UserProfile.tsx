@@ -31,7 +31,6 @@ const ProfileSkeletonLoader = () => (
     <div className="h-4 w-1/3 rounded bg-gray-300"></div>
   </div>
 );
-//
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -49,14 +48,17 @@ const UserProfile = () => {
   const [newPhoto, setNewPhoto] = useState<File | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [loadingPhoto, setLoadingPhoto] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
 
   const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
   useEffect(() => {
     const fetchUserProfile = async () => {
+      setLoadingMessage('Loading your profile...');
       if (!user) {
         setLoading(false);
         setStatusMessage('Please login to view or edit your profile details.');
+        setLoadingMessage('');
         return;
       }
 
@@ -64,12 +66,12 @@ const UserProfile = () => {
       if (!accessToken) {
         setLoading(false);
         setStatusMessage('Authentication token missing. Please log in again.');
+        setLoadingMessage('');
         return;
       }
 
       try {
         const response = await fetch(`${DJANGO_API_BASE_URL}profile/me`, {
-          // Endpoint for current user's profile
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -90,6 +92,7 @@ const UserProfile = () => {
         setStatusMessage(error.message || 'Failed to load profile data.');
       } finally {
         setLoading(false);
+        setLoadingMessage('');
       }
     };
 
@@ -116,6 +119,7 @@ const UserProfile = () => {
     }
 
     setStatusMessage('');
+    setLoadingMessage('Updating profile...');
     try {
       const formData = new FormData();
       formData.append('email', newEmail);
@@ -146,6 +150,8 @@ const UserProfile = () => {
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setStatusMessage('Failed to update profile: ' + error.message);
+    } finally {
+      setLoadingMessage('');
     }
   };
 
@@ -159,7 +165,7 @@ const UserProfile = () => {
 
     setLoadingPhoto(true);
     setStatusMessage('Uploading photo...');
-
+    setLoadingMessage('Uploading photo...');
     try {
       const formData = new FormData();
       formData.append('photo', file);
@@ -178,6 +184,7 @@ const UserProfile = () => {
       }
 
       const updatedData = await response.json();
+      console.log(updatedData);
       setProfile(updatedData);
       setStatusMessage('Photo updated successfully!');
       showAlert('success', 'Photo uploaded successfully 🎉');
@@ -187,12 +194,18 @@ const UserProfile = () => {
       showAlert('error', 'Failed to upload photo 😟');
     } finally {
       setLoadingPhoto(false);
+      setLoadingMessage('');
     }
   };
 
   if (loading) {
     return (
       <div>
+        {loadingMessage && (
+          <div className="mb-4 rounded-lg bg-yellow-100 p-3 text-yellow-800">
+            {loadingMessage}
+          </div>
+        )}
         <h2 className="mb-6 text-3xl font-bold text-gray-900">My Profile</h2>
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
           <ProfileSkeletonLoader />
@@ -203,6 +216,11 @@ const UserProfile = () => {
 
   return (
     <div>
+      {loadingMessage && (
+        <div className="mb-4 rounded-lg bg-yellow-100 p-3 text-yellow-800">
+          {loadingMessage}
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h2 className="mb-6 text-3xl font-bold text-gray-900">My Profile</h2>
         {!user && (
@@ -240,7 +258,11 @@ const UserProfile = () => {
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
         {statusMessage && !user && (
           <div
-            className={`mb-4 rounded-lg p-3 ${statusMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
+            className={`mb-4 rounded-lg p-3 ${
+              statusMessage.includes('Error')
+                ? 'bg-red-100 text-red-700'
+                : 'bg-green-100 text-green-700'
+            }`}
           >
             {statusMessage}
           </div>
@@ -328,12 +350,14 @@ const UserProfile = () => {
               <button
                 onClick={handleUpdateProfile}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+                disabled={loading || loadingPhoto}
               >
-                Save Changes
+                {loading || loadingPhoto ? 'Saving...' : 'Save Changes'}
               </button>
               <button
                 onClick={() => setEditMode(false)}
                 className="rounded-lg bg-gray-300 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-400"
+                disabled={loading || loadingPhoto}
               >
                 Cancel
               </button>

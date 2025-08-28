@@ -43,7 +43,7 @@ const FAQSection = () => (
         answer="Our eligibility checker uses a rule-based system combined with AI insights to provide highly accurate assessments based on official admission requirements. However, always confirm with the institution."
       />
       <FAQItem
-        question="Can I save my favorite courses and institutions?"
+        question="Can I save my favourite courses and institutions?"
         answer="Yes, once logged in, you can save institutions and courses to your personalized dashboard for easy access."
       />
       <FAQItem
