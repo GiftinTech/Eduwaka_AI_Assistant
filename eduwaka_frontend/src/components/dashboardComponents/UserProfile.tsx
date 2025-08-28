@@ -204,7 +204,7 @@ const UserProfile = () => {
       <p className="mb-4 text-gray-700">
         Manage your personal information and saved data.
       </p>
-      {!profile?.photo && (
+      {profile?.photo && (
         <Button
           variant="secondary"
           className="mb-4"
@@ -237,7 +237,7 @@ const UserProfile = () => {
 
         {editMode && user ? (
           <div className="space-y-4">
-            {/* ✅ Upload photo input */}
+            {/* Upload photo input */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
                 Profile Photo
