@@ -5,8 +5,14 @@ It provides tools to search institutions, explore courses, check eligibility, es
 
 ---
 
+
 ### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/dashboard](https://eduwaka-ai-assistant.onrender.com/dashboard)
+
+ [Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
+
 ### **API Server**: [https://eduwaka-ai-assistant-server.onrender.com/api/](https://eduwaka-ai-assistant-server.onrender.com/api/)
+
+[Server README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
 ---
 
@@ -95,6 +101,8 @@ Frontend runs at: `http://127.0.0.1:5173/`
 - `GET /api/institutions/` – List all institutions
 - `GET /api/courses/` – List all courses
 - `POST /api/eligibility/check/` – Check admission eligibility
+- `POST /api/ai/chatbot/` – Check admission
+- `POST /api/ai/institution-overview/` – Check admission
 
 ---
 
