@@ -1,5 +1,5 @@
 import { useEffect, type JSX } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   Search,
@@ -15,6 +15,7 @@ import {
   HelpCircle,
   ChevronRight,
   X,
+  LogIn,
 } from 'lucide-react';
 import { useAlert } from '../../hooks/useAlert';
 
@@ -72,7 +73,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
-  const { handleLogout } = useAuth();
+  const { handleLogout, user } = useAuth();
   const { showAlert } = useAlert();
 
   const location = useLocation();
@@ -204,13 +205,25 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
       </div>
 
       <div>
-        <button
-          onClick={onLogoutClick}
-          className="mt-2 flex w-full items-center rounded-lg px-4 py-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
-        >
-          <LogOut size={20} className="mr-3" />
-          <span className="font-medium">Logout</span>
-        </button>
+        {user ? (
+          <button
+            onClick={onLogoutClick}
+            className="mt-2 flex w-full items-center rounded-lg px-4 py-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
+          >
+            <LogOut size={20} className="mr-3" />
+            <span className="font-medium">Logout</span>
+          </button>
+        ) : (
+          <button>
+            <Link
+              to="/login"
+              className="mt-2 flex w-full items-center rounded-lg px-4 py-2 text-green-600 transition-colors duration-200 hover:bg-green-100"
+            >
+              <LogIn size={20} className="mr-3" />
+              <span className="font-medium">Login</span>
+            </Link>
+          </button>
+        )}
       </div>
     </div>
   );

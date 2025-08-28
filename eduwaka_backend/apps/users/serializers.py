@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
+from django.conf import settings
 
 from apps.users.models import UserProfile
 
@@ -33,10 +34,21 @@ class RegisterSerializer(serializers.ModelSerializer):
     return super().create(validated_data)
 
 class UserProfileSerializer(serializers.ModelSerializer):
+  photo = serializers.SerializerMethodField()
+
   class Meta:
     model = UserProfile
     fields = ('id', 'username', 'email', 'first_name', 'last_name', 'photo')
-    # read_only_fields = ('username', 'email')
+
+  def get_photo(self, obj):
+    if obj.photo:
+      request = self.context.get('request')
+      if request:
+        return request.build_absolute_uri(obj.photo.url)
+      else:
+        # Fallback for when request context isn't available
+        return f"{settings.MEDIA_URL}{obj.photo}"
+    return None
 
 # Change pwd 
 class ChangePasswordSerializer(serializers.Serializer):

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../ui/button';
 import { EditIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAlert } from '../../hooks/useAlert';
 
 interface UserProfileData {
   id: number;
@@ -35,6 +36,7 @@ const ProfileSkeletonLoader = () => (
 const UserProfile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showAlert } = useAlert();
 
   const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,6 +48,7 @@ const UserProfile = () => {
   const [newLastName, setNewLastName] = useState<string>(user?.last_name || '');
   const [newPhoto, setNewPhoto] = useState<File | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('');
+  const [loadingPhoto, setLoadingPhoto] = useState<boolean>(false);
 
   const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
@@ -154,6 +157,9 @@ const UserProfile = () => {
       return;
     }
 
+    setLoadingPhoto(true);
+    setStatusMessage('Uploading photo...');
+
     try {
       const formData = new FormData();
       formData.append('photo', file);
@@ -174,9 +180,13 @@ const UserProfile = () => {
       const updatedData = await response.json();
       setProfile(updatedData);
       setStatusMessage('Photo updated successfully!');
+      showAlert('success', 'Photo uploaded successfully 🎉');
     } catch (err: any) {
       console.error('Error uploading photo:', err);
       setStatusMessage('Failed to upload photo: ' + err.message);
+      showAlert('error', 'Failed to upload photo 😟');
+    } finally {
+      setLoadingPhoto(false);
     }
   };
 
@@ -209,8 +219,9 @@ const UserProfile = () => {
           variant="secondary"
           className="mb-4"
           onClick={() => document.getElementById('photoUpload')?.click()}
+          disabled={loadingPhoto}
         >
-          Upload Photo
+          {loadingPhoto ? 'Uploading...' : 'Upload New Photo'}
           <input
             type="file"
             id="photoUpload"
@@ -227,7 +238,7 @@ const UserProfile = () => {
       )}
 
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
-        {statusMessage && (
+        {statusMessage && !user && (
           <div
             className={`mb-4 rounded-lg p-3 ${statusMessage.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
           >
