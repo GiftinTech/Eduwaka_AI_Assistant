@@ -31,17 +31,13 @@ const Hero = () => {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20 md:px-16">
-      {/* Background Pattern - adjusted for a white background */}
       <div className="absolute inset-0 opacity-10">
-        {/* Removed bg-gradient-to-br, replaced with a subtle solid background */}
         <div className="absolute inset-0 bg-gray-50 dark:bg-gray-800"></div>
         <div className="bg-primary-500/20 absolute right-0 top-0 h-96 w-96 rounded-full blur-3xl"></div>{' '}
-        {/* Changed to primary color */}
         <div className="bg-secondary-500/20 absolute bottom-0 left-0 h-96 w-96 rounded-full blur-3xl"></div>{' '}
-        {/* Changed to secondary color */}
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Content */}
           <div className="text-center lg:text-left">
@@ -61,7 +57,6 @@ const Hero = () => {
               Simplify Your
               <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {' '}
-                {/* Using direct gradient for span for clarity */}
                 University Journey
               </span>
             </h1>
@@ -75,7 +70,7 @@ const Hero = () => {
             </p>
 
             <div
-              className={`delay-600 mb-8 flex flex-row justify-center gap-4 transition-all duration-1000 lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`delay-600 mb-8 flex flex-col justify-center gap-4 transition-all duration-1000 sm:flex-row lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
             >
               <Button
                 size="lg"
