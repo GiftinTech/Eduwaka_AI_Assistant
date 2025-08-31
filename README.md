@@ -6,7 +6,7 @@ It provides tools to search institutions, explore courses, check eligibility, es
 ---
 
 
-### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/dashboard](https://eduwaka-ai-assistant.onrender.com/)
+### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/](https://eduwaka-ai-assistant.onrender.com/)
 
  [Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
