@@ -4,7 +4,7 @@ This is the **frontend client** for EduWaka – a platform helping Nigerian stud
 The frontend is built with **React, TypeScript, TailwindCSS and Vite**.
 
 ---
-**Live Link**: [https://eduwaka-ai-assistant.onrender.com/dashboard](https://eduwaka-ai-assistant.onrender.com/dashboard)
+**Live Link**: [https://eduwaka-ai-assistant.onrender.com/](https://eduwaka-ai-assistant.onrender.com/)
 
 ## 🚀 Tech Stack
 

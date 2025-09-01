@@ -1,12 +1,12 @@
 # **Fullstack README (Backend + Frontend)**
 
 EduWaka is an **AI-powered web platform** that helps Nigerian students simplify their university admission journey.
-It provides tools to search institutions, explore courses, check eligibility, estimate fees, and prepare for exams – all in one place.
+It provides tools to search institutions, explore courses, check eligibility, estimate fees, and AI chatbot, all in one place.
 
 ---
 
 
-### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/dashboard](https://eduwaka-ai-assistant.onrender.com/dashboard)
+### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/](https://eduwaka-ai-assistant.onrender.com/)
 
  [Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
