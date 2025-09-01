@@ -114,16 +114,22 @@ WSGI_APPLICATION = 'eduwaka_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 if 'DATABASE_URL' in os.environ:
+    # Use dj-database-url to get the base configuration
+    database_config = dj_database_url.config(
+        default=os.environ['DATABASE_URL'],
+        conn_max_age=0, 
+        ssl_require=True, 
+    )
+
+    # Add the OPTIONS dictionary to the result
+    database_config['OPTIONS'] = {'options': '-c statement_timeout=0'}
+    
+    # Assign the final configuration to DATABASES
     DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ['DATABASE_URL'],
-            conn_max_age=0, 
-            ssl_require=True, 
-            OPTIONS={'options': '-c statement_timeout=0'}
-        )
+        'default': database_config
     }
 else:
-    # Use your local settings for development
+    # Use local settings for development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
