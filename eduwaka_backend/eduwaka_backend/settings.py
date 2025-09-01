@@ -117,8 +117,9 @@ if 'DATABASE_URL' in os.environ:
     DATABASES = {
         'default': dj_database_url.config(
             default=os.environ['DATABASE_URL'],
-            conn_max_age=60, 
+            conn_max_age=0, 
             ssl_require=True, 
+            OPTIONS={'options': '-c statement_timeout=0'}
         )
     }
 else:
