@@ -148,6 +148,12 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
             isActive={isActive('eligibilityCheckerAI')}
           />
           <SidebarItem
+            icon={<Bot size={20} />}
+            label="Chatbot"
+            onClick={() => navigate('/dashboard/chatbot')}
+            isActive={isActive('chatbot')}
+          />
+          <SidebarItem
             icon={<NairaIcon />}
             label="Tuition/Fee Checker"
             onClick={() => navigate('/dashboard/tuitionChecker')}
@@ -194,12 +200,6 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
             label="Support/Ask for Help"
             onClick={() => navigate('/dashboard/supportHelpDesk')}
             isActive={isActive('supportHelpDesk')}
-          />
-          <SidebarItem
-            icon={<Bot size={20} />}
-            label="Chatbot"
-            onClick={() => navigate('/dashboard/chatbot')}
-            isActive={isActive('chatbot')}
           />
         </nav>
       </div>

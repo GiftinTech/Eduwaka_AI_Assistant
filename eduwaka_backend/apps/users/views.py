@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils import timezone
 from datetime import timedelta
+from django.db import OperationalError
 from rest_framework.parsers import MultiPartParser, FormParser
 
 User = get_user_model()
@@ -30,12 +31,20 @@ class LoginViewSet(APIView):
     username = serializer.validated_data['username']
     password = serializer.validated_data['password']
 
+
     try:
-      user = User.objects.get(username=username)
-    except User.DoesNotExist:
-      return Response(
+      try:
+        user = User.objects.get(username=username)
+      except User.DoesNotExist:
+        return Response(
           {"detail": "Invalid username or password."},
           status=status.HTTP_401_UNAUTHORIZED
+        )
+    except OperationalError:
+      # Graceful DB error handling
+      return Response(
+        {"detail": "Database connection failed. Please try again later."},
+        status=status.HTTP_503_SERVICE_UNAVAILABLE
       )
     
     # Soft-delete logic
