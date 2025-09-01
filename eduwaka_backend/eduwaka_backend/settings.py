@@ -15,6 +15,9 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url
+from django.db import connections
+from django.db.utils import OperationalError
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -247,3 +250,24 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+
+
+# --- DB Connection Check on Startup ---
+
+logger = logging.getLogger(__name__)
+
+try:
+    db_conn = connections['default']
+    settings_dict = db_conn.settings_dict 
+
+    logger.info(
+        f"📡 Trying database connection to "
+        f"{settings_dict.get('HOST')}:{settings_dict.get('PORT')} / {settings_dict.get('NAME')}"
+    )
+
+    db_conn.cursor()  # test the connection
+    logger.info("---------------------------------------")
+    logger.info("✅ Database connection successful!")
+    logger.info("---------------------------------------")
+except OperationalError as e:
+    logger.error(f"❌ Database connection failed: {e}")
