@@ -45,15 +45,15 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # ]
 
 # Prod
-DEBUG = False
-ALLOWED_HOSTS = ['*']
+DEBUG = os.getenv("DEBUG")
+ALLOWED_HOSTS = [
+    "eduwaka-ai-assistant-server.onrender.com",
+    "eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "localhost:5173",
+    "127.0.0.1",
+]
+#ALLOWED_HOSTS = ['*']
 
-# ALLOWED_HOSTS = [
-#     "eduwaka-ai-assistant-server.onrender.com",
-#     "eduwaka-ai-assistant.onrender.com", # React frontend's live address
-#     "localhost:5173",
-#     "127.0.0.1",
-# ]
 
 # Application definition
 
@@ -198,12 +198,12 @@ REST_FRAMEWORK = {
 }
 
 # CORS Headers Config
-CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
-#     "http://localhost:5173", # React frontend's local address
-#     "http://127.0.0.1:8000",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "http://localhost:5173", # React frontend's local address
+    "http://127.0.0.1:8000",
+]
+#CORS_ALLOW_ALL_ORIGINS = True
 
 # Allow eduwaka_frontend to send cookies and auth headers
 CORS_ALLOW_CREDENTIALS = True
