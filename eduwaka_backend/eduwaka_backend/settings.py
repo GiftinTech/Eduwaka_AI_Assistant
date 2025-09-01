@@ -18,6 +18,7 @@ import dj_database_url
 from django.db import connections
 from django.db.utils import OperationalError
 import logging
+import socket
 
 # Load environment variables from .env file
 load_dotenv()
@@ -257,16 +258,23 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 logger = logging.getLogger(__name__)
 
+db_url = os.environ.get("DATABASE_URL", "")
+parsed = dj_database_url.parse(db_url)
+
+safe_url = f"postgres://{parsed['USER']}@{parsed['HOST']}:{parsed['PORT']}/{parsed['NAME']}"
+logger.info(f"🌍 DATABASE_URL (safe): {safe_url}")
+
 try:
-    db_conn = connections['default']
-    settings_dict = db_conn.settings_dict 
+    host = dj_database_url.parse(db_url)['HOST']
+    port = dj_database_url.parse(db_url)['PORT']
+    logger.info(f"🔌 Trying to connect {host}:{port}")
+    socket.create_connection((host, int(port)), timeout=5)
+    logger.info("✅ TCP connection successful (before Django)")
+except Exception as e:
+    logger.error(f"❌ TCP connection failed: {e}")
 
-    logger.info(
-        f"📡 Trying database connection to "
-        f"{settings_dict.get('HOST')}:{settings_dict.get('PORT')} / {settings_dict.get('NAME')}"
-    )
-
-    db_conn.cursor()  # test the connection
+try:
+    connections['default'].cursor()  # test the connection
     logger.info("---------------------------------------")
     logger.info("✅ Database connection successful!")
     logger.info("---------------------------------------")
