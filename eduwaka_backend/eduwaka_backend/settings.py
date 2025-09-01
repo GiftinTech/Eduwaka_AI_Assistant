@@ -117,12 +117,12 @@ if 'DATABASE_URL' in os.environ:
     # Use dj-database-url to get the base configuration
     database_config = dj_database_url.config(
         default=os.environ['DATABASE_URL'],
-        conn_max_age=0, 
+        conn_max_age=60, 
         ssl_require=True, 
     )
 
     # Add the OPTIONS dictionary to the result
-    database_config['OPTIONS'] = {'options': '-c statement_timeout=0'}
+    database_config['OPTIONS'] = {'options': '-c statement_timeout=30'}
     
     # Assign the final configuration to DATABASES
     DATABASES = {
