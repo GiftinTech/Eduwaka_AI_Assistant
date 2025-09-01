@@ -15,9 +15,8 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url
-import psycopg2
-from psycopg2 import OperationalError
 import logging
+import psycopg2
 
 # Load environment variables from .env file
 load_dotenv()
@@ -256,20 +255,13 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 # --- DB Connection Check on Startup ---
 
 logger = logging.getLogger(__name__)
+db_url = os.environ.get("DATABASE_URL")
 
-logging.basicConfig(level=logging.INFO)
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-if not DATABASE_URL:
-    logger.error("❌ DATABASE_URL not set in environment!")
-else:
-    try:
-        logger.info(f"📡 Attempting TCP connection to Supabase DB...")
-        conn = psycopg2.connect(DATABASE_URL, connect_timeout=5)
-        logger.info("---------------------------------------")
-        logger.info("✅ Database connection successful!")
-        logger.info("---------------------------------------")
-        conn.close()
-    except OperationalError as e:
-        logger.error(f"❌ Database connection failed: {e}")
+try:
+    conn = psycopg2.connect(db_url)
+    logger.info("--------------------------------")
+    logger.info("✅ DB connection successful!")
+    logger.info("--------------------------------")
+    conn.close()
+except Exception as e:
+    logger.error(f"❌ DB connection failed: {e}")
