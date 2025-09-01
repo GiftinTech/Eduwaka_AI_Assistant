@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils import timezone
 from datetime import timedelta
-from django.db import OperationalError
+from django.db import OperationalError, DatabaseError
 from rest_framework.parsers import MultiPartParser, FormParser
 
 User = get_user_model()
@@ -25,14 +25,14 @@ class LoginViewSet(APIView):
   serializer_class = LoginSerializer
 
   def post(self, request, *args, **kwargs):
-    serializer = self.serializer_class(data=request.data)
-    serializer.is_valid(raise_exception=True)
-
-    username = serializer.validated_data['username']
-    password = serializer.validated_data['password']
-
-
     try:
+      serializer = self.serializer_class(data=request.data)
+      serializer.is_valid(raise_exception=True)
+
+      username = serializer.validated_data['username']
+      password = serializer.validated_data['password']
+
+
       try:
         user = User.objects.get(username=username)
       except User.DoesNotExist:
@@ -40,48 +40,57 @@ class LoginViewSet(APIView):
           {"detail": "Invalid username or password."},
           status=status.HTTP_401_UNAUTHORIZED
         )
-    except OperationalError:
+    
+      # Soft-delete logic
+      if user.is_deleted:
+        deletion_time = user.deleted_at
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        
+        if deletion_time >= thirty_days_ago:
+          if user.check_password(password):
+            # Reactivate the account before generating tokens
+            user.is_deleted = False
+            user.deleted_at = None
+            user.save()
+            
+            # Get tokens using the Simple JWT serializer
+            jwt_serializer = TokenObtainPairSerializer(data=request.data)
+            jwt_serializer.is_valid(raise_exception=True)
+            
+            response_data = jwt_serializer.validated_data
+            response_data["detail"] = "Account recovered and logged in successfully."
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+          return Response(
+              {"detail": "This account is permanently deleted. Please create a new one."},
+              status=status.HTTP_403_FORBIDDEN
+          )
+
+      # Standard login for non-deleted accounts
+      if user.check_password(password):
+        jwt_serializer = TokenObtainPairSerializer(data=request.data)
+        jwt_serializer.is_valid(raise_exception=True)
+        return Response(jwt_serializer.validated_data, status=status.HTTP_200_OK)
+      
+      return Response(
+        {"detail": "Invalid username or password."},
+        status=status.HTTP_401_UNAUTHORIZED
+      )
+    except (OperationalError, DatabaseError) as e:
       # Graceful DB error handling
       return Response(
         {"detail": "Database connection failed. Please try again later."},
         status=status.HTTP_503_SERVICE_UNAVAILABLE
       )
-    
-    # Soft-delete logic
-    if user.is_deleted:
-      deletion_time = user.deleted_at
-      thirty_days_ago = timezone.now() - timedelta(days=30)
-      
-      if deletion_time >= thirty_days_ago:
-        if user.check_password(password):
-          # Reactivate the account before generating tokens
-          user.is_deleted = False
-          user.deleted_at = None
-          user.save()
-          
-          # Get tokens using the Simple JWT serializer
-          jwt_serializer = TokenObtainPairSerializer(data=request.data)
-          jwt_serializer.is_valid(raise_exception=True)
-          
-          response_data = jwt_serializer.validated_data
-          response_data["detail"] = "Account recovered and logged in successfully."
-          return Response(response_data, status=status.HTTP_200_OK)
-      else:
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Login error: {str(e)}")
+        
         return Response(
-            {"detail": "This account is permanently deleted. Please create a new one."},
-            status=status.HTTP_403_FORBIDDEN
+          {"detail": "An error occurred. Please try again."},
+          status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
-    # Standard login for non-deleted accounts
-    if user.check_password(password):
-      jwt_serializer = TokenObtainPairSerializer(data=request.data)
-      jwt_serializer.is_valid(raise_exception=True)
-      return Response(jwt_serializer.validated_data, status=status.HTTP_200_OK)
-    
-    return Response(
-      {"detail": "Invalid username or password."},
-      status=status.HTTP_401_UNAUTHORIZED
-    )
 
 # Get all users - Admin
 class UserListViewSet(generics.ListAPIView):
