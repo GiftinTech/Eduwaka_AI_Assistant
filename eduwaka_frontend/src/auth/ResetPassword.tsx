@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 import Button from '../components/ui/button';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ResetPassword = () => {
   // Access auth functions and state from the context
@@ -14,6 +15,10 @@ const ResetPassword = () => {
   const [formAuthError, setFormAuthError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // UX states for Login
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   // Extract uidb64 and token from param
   const { uidb64, token } = useParams();
@@ -77,18 +82,28 @@ const ResetPassword = () => {
             >
               New Password
             </label>
-            <input
-              type="password"
-              id="newPassword"
-              placeholder="Enter new password"
-              className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              value={newPassword}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setNewPassword(e.target.value)
-              }
-              required
-              disabled={isSubmitting || loadingAuth}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="newPassword"
+                placeholder="Enter new password"
+                className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                value={newPassword}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setNewPassword(e.target.value)
+                }
+                required
+                disabled={isSubmitting || loadingAuth}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 focus:outline-none dark:text-gray-400"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
           <div>
             <label
@@ -97,18 +112,30 @@ const ResetPassword = () => {
             >
               Confirm Password
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              placeholder="Confirm new password"
-              className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              value={confirmPassword}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setConfirmPassword(e.target.value)
-              }
-              required
-              disabled={isSubmitting || loadingAuth}
-            />
+            <div className="relative">
+              <input
+                type={showPasswordConfirm ? 'text' : 'password'}
+                id="confirmPassword"
+                placeholder="Confirm new password"
+                className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                value={confirmPassword}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
+                required
+                disabled={isSubmitting || loadingAuth}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswordConfirm((prev) => !prev)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 focus:outline-none dark:text-gray-400"
+                aria-label={
+                  showPasswordConfirm ? 'Hide password' : 'Show password'
+                }
+              >
+                {showPasswordConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           {formAuthError && (
