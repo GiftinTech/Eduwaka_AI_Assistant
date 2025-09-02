@@ -122,7 +122,7 @@ if 'DATABASE_URL' in os.environ:
     )
 
     # Add the OPTIONS dictionary to the result
-    database_config['OPTIONS'] = {'options': '-c statement_timeout=30'}
+    database_config['OPTIONS'] = {'options': '-c statement_timeout=30000','MAX_CONNS': 5,}
     
     # Assign the final configuration to DATABASES
     DATABASES = {
