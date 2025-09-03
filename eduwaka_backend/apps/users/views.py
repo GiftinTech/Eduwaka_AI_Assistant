@@ -16,6 +16,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db import OperationalError, DatabaseError
 from rest_framework.parsers import MultiPartParser, FormParser
+import socket
+from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -236,3 +238,21 @@ class ResetPasswordViewSet(APIView):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def network_debug(request):
+  results = {}
+
+  aiven_host = "pg-13e9e2d2-eduwaka.d.aivencloud.com" 
+  
+  # Test TCP connection
+  try:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(10)
+    result = sock.connect_ex((aiven_host, 5432))
+    sock.close()
+    results['can_connect'] = result == 0
+    results['error_code'] = result
+    results['host'] = aiven_host
+  except Exception as e:
+    results['error'] = str(e)
+      
+  return JsonResponse(results)

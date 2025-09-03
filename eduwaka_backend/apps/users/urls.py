@@ -5,6 +5,7 @@ from apps.users.serializers import RegisterSerializer # Import the serializer fo
 from rest_framework_simplejwt.views import TokenRefreshView # Import JWT views
 from rest_framework.generics import CreateAPIView # For registration view
 from rest_framework.permissions import AllowAny # For registration view
+from . import views
 
 router = DefaultRouter()
 
@@ -35,4 +36,7 @@ urlpatterns = [
   # Forgot pwd and reset pwd
   path('auth/forgot-password/', ForgotPasswordViewSet.as_view(), name='forgot-password'),
   path('auth/reset-password/', ResetPasswordViewSet.as_view(), name='reset-password'),
+
+  # test network
+  path('network-test/', views.network_debug, name='network_debug'),
 ]
