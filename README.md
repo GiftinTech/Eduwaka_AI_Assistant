@@ -5,10 +5,9 @@ It provides tools to search institutions, explore courses, check eligibility, es
 
 ---
 
-
 ### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/](https://eduwaka-ai-assistant.onrender.com/)
 
- [Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
+[Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
 ### **API Server**: [https://eduwaka-ai-assistant-server.onrender.com/api/](https://eduwaka-ai-assistant-server.onrender.com/api/)
 
@@ -115,8 +114,8 @@ Frontend runs at: `http://127.0.0.1:5173/`
 
 ## 👨‍💻 Contributing
 
-1. Fork project
-2. Create feature branch (`git checkout -b feature-name`)
-3. Commit changes (`git commit -m "Add feature"`)
-4. Push branch (`git push origin feature-name`)
-5. Create Pull Request
+See the [Contributing guidelines](CONTRIBUTING.md)
+
+## 📜 License
+
+This project is licensed under the [GNU AGPLv3 License](LICENSE) – see the [LICENSE](LICENSE) file for details.
