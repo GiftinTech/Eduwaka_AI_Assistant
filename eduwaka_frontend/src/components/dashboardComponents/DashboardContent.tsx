@@ -1,80 +1,168 @@
 import { type JSX } from 'react';
-
-import { BookOpen, Bot, ListChecks, Search } from 'lucide-react';
+import { BookOpen, Bot, ListChecks, Search, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 interface DashboardCardProps {
   title: string;
   description: string;
   icon: JSX.Element;
   onClick?: () => void;
+  accent: string;
+  accentBg: string;
+  tag?: string;
+  tagColor?: string;
 }
 
-// DashboardCard component
-// DashboardCard component
 const DashboardCard = ({
   title,
   description,
   icon,
   onClick,
+  accent,
+  accentBg,
+  tag,
+  tagColor,
 }: DashboardCardProps) => (
   <button
     onClick={onClick}
-    className="flex w-full transform flex-col items-center rounded-lg bg-white p-6 text-center shadow-md transition-shadow duration-300 hover:-translate-y-1 hover:shadow-xl"
+    className="group relative flex flex-col items-start overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-transparent hover:shadow-md"
+    style={{ ['--hover-shadow' as string]: `0 4px 24px ${accent}18` }}
   >
-    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+    {tag && (
+      <span
+        className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+        style={{
+          background: `${tagColor ?? accent}18`,
+          color: tagColor ?? accent,
+        }}
+      >
+        {tag}
+      </span>
+    )}
+    <div
+      className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110"
+      style={{ background: accentBg, color: accent }}
+    >
       {icon}
     </div>
-    <h4 className="mb-2 text-xl font-semibold text-gray-900">{title}</h4>
-    <p className="text-sm text-gray-600">{description}</p>
+    <h4 className="mb-1 text-sm font-bold text-[#111827]">{title}</h4>
+    <p className="mb-4 text-xs leading-relaxed text-[#6b7280]">{description}</p>
+    <div
+      className="mt-auto flex items-center gap-1 text-xs font-bold"
+      style={{ color: accent }}
+    >
+      Open{' '}
+      <ArrowRight
+        size={12}
+        className="transition-transform group-hover:translate-x-0.5"
+      />
+    </div>
   </button>
 );
+
 const DashboardContent = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
 
   return (
     <div>
-      <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        Welcome to Edu
-        <span className="text-pink-600 dark:text-pink-400">Waka!</span>
-      </h2>
-      <p className="mb-8 text-lg text-gray-700">
-        Your AI powered guide to university admissions in Nigeria.
-      </p>
+      {/* Hero banner */}
+      <div className="mb-10 overflow-hidden rounded-2xl bg-[#00252e] px-7 py-8 text-white">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="mb-1 text-sm font-medium text-[#4a8fa0]">
+              {greeting()}, {user?.username ?? 'there'} 👋
+            </p>
+            <h2 className="text-2xl font-extrabold leading-tight tracking-tight">
+              Welcome to Edu<span className="text-[#eb4799]">Waka</span>
+            </h2>
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-[#4a8fa0]">
+              Your AI-powered guide to university admissions in Nigeria.
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Quick actions */}
+      <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
+        Quick Actions
+      </p>
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <DashboardCard
-          title="Quick Search"
-          description="Find institutions and courses quickly."
-          icon={<Search size={24} />}
+          title="Search Institutions"
+          description="Find universities, polytechnics and colleges across Nigeria."
+          icon={<Search size={18} />}
           onClick={() => navigate('searchInstitutions/')}
+          accent="#4853ea"
+          accentBg="#4853ea12"
         />
         <DashboardCard
-          title="Eligibility Check"
-          description="See if you meet course requirements with AI."
-          icon={<ListChecks size={24} />}
+          title="Eligibility Checker"
+          description="Find out if you qualify for your desired course with AI analysis."
+          icon={<ListChecks size={18} />}
           onClick={() => navigate('eligibilityCheckerAI/')}
+          accent="#eb4799"
+          accentBg="#eb479912"
+          tag="AI"
+          tagColor="#eb4799"
+        />
+        <DashboardCard
+          title="EduWaka Chatbot"
+          description="Ask anything about JAMB, Post-UTME and your admission journey."
+          icon={<Bot size={18} />}
+          onClick={() => navigate('chatbot/')}
+          accent="#eb4799"
+          accentBg="#eb479912"
+          tag="AI"
+          tagColor="#eb4799"
         />
         <DashboardCard
           title="Exam Prep"
-          description="Tools to help you prepare for CBT exams."
-          icon={<BookOpen size={24} />}
-        />
-        <DashboardCard
-          title="Chat EduwakaBot"
-          description="Ask Eduwaka assistant anything about your admission journey."
-          icon={<Bot size={24} />}
-          onClick={() => navigate('chatbot/')}
+          description="CBT practice tools and study resources to boost your score."
+          icon={<BookOpen size={18} />}
+          accent="#4853ea"
+          accentBg="#4853ea12"
+          tag="Soon"
+          tagColor="#9ca3af"
         />
       </div>
-      <div className="mt-8">
-        <h3 className="mb-4 text-xl font-semibold text-gray-900">
-          What's New?
-        </h3>
-        <ul className="list-inside list-disc space-y-2 text-gray-700">
-          <li>New institutions added to our database!</li>
-          <li>Improved JAMB subject combination checker.</li>
-          <li>Interactive CBT practice questions coming soon!</li>
+
+      {/* What's new */}
+      <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
+        <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
+          What's New
+        </p>
+        <ul className="space-y-3">
+          {[
+            { dot: '#eb4799', text: 'New institutions added to our database' },
+            {
+              dot: '#4853ea',
+              text: 'Improved JAMB subject combination checker',
+            },
+            {
+              dot: '#9ca3af',
+              text: 'Interactive CBT practice questions — coming soon!',
+            },
+          ].map((item) => (
+            <li
+              key={item.text}
+              className="flex items-center gap-3 text-sm text-[#374151]"
+            >
+              <span
+                className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                style={{ background: item.dot }}
+              />
+              {item.text}
+            </li>
+          ))}
         </ul>
       </div>
     </div>

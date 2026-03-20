@@ -7,8 +7,6 @@ import {
   IoLogoInstagram,
 } from 'react-icons/io5';
 
-import eduwakaLogo from '../assets/edu_logo.svg';
-
 const CompanyInformation: React.FC = () => {
   return (
     <article className="relative block bg-[hsl(192,100%,9%)] p-[5%] pt-[20%] text-[hsl(207,100%,98%)] sm:flex sm:flex-row-reverse sm:pt-[5%]">
@@ -52,15 +50,16 @@ const CompanyInformation: React.FC = () => {
         <section className="sm:flex-1 lg:-mt-8">
           <figure>
             <img
-              className="h-20 w-auto" // was h-8
-              src={eduwakaLogo}
-              alt="Eduwaka Logo"
+              src="/images/eduwaka-logo-white.png"
+              alt="EduWaka helps Nigerian students navigate university admissions with intelligent tools for institution search, course eligibility, fee estimation, and exam preparation."
+              className="h-32 w-32 object-contain"
             />
           </figure>
 
           <p className="max-w-md text-sm leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
-            nulla quam, hendrerit lacinia vestibulum a, ultrices quis sem.
+            Helping Nigerian students navigate university admissions with
+            intelligent tools for institution search, course eligibility, AI
+            Chatbot, fee estimation, and exam preparation.
           </p>
 
           <ul className="mt-4 space-y-4 text-sm">

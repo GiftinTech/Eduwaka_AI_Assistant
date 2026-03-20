@@ -13,38 +13,11 @@ import {
   LogOut,
   Home,
   HelpCircle,
-  ChevronRight,
   X,
   LogIn,
+  Banknote,
 } from 'lucide-react';
 import { useAlert } from '../../hooks/useAlert';
-
-const NairaIcon = ({
-  size = 24,
-  className = 'ml-[2px]',
-}: {
-  size?: number;
-  className?: string;
-}) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    fill="currentColor"
-    viewBox="0 0 24 24"
-    className={className}
-  >
-    <text
-      x="0"
-      y="20"
-      fontSize="20"
-      fontFamily="Arial, sans-serif"
-      fontWeight="500"
-    >
-      ₦
-    </text>
-  </svg>
-);
 
 interface SidebarItemProps {
   icon: JSX.Element;
@@ -56,15 +29,21 @@ interface SidebarItemProps {
 const SidebarItem = ({ icon, label, onClick, isActive }: SidebarItemProps) => (
   <button
     onClick={onClick}
-    className={`flex w-full items-center rounded-lg px-4 py-2 transition-colors duration-200 ${
+    className={`group flex w-full items-center rounded-xl px-3 py-2.5 text-sm transition-all duration-150 ${
       isActive
-        ? 'bg-pink-100 font-semibold text-pink-700'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        ? 'bg-[#eb4799]/15 font-semibold text-[#eb4799]'
+        : 'font-normal text-[#7eaab5] hover:bg-white/5 hover:text-white'
     }`}
   >
-    {icon}
-    <span className="ml-3">{label}</span>
-    {isActive && <ChevronRight size={16} className="ml-auto text-pink-700" />}
+    <span
+      className={`mr-3 flex-shrink-0 transition-colors ${isActive ? 'text-[#eb4799]' : 'text-[#3d7080] group-hover:text-[#7eaab5]'}`}
+    >
+      {icon}
+    </span>
+    <span className="truncate">{label}</span>
+    {isActive && (
+      <span className="ml-auto h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#eb4799]" />
+    )}
   </button>
 );
 
@@ -75,10 +54,8 @@ interface SidebarProps {
 const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
   const { handleLogout, user } = useAuth();
   const { showAlert } = useAlert();
-
   const location = useLocation();
   const navigate = useNavigate();
-
   const currentPath = location.pathname;
 
   useEffect(() => {
@@ -87,7 +64,6 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
         setIsSidebarOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [setIsSidebarOpen]);
@@ -97,132 +73,147 @@ const Sidebar = ({ setIsSidebarOpen }: SidebarProps) => {
     if (result.success) {
       navigate('/');
       showAlert('success', 'Successfully logged out.', 5);
-    } else {
-      console.error('Logout failed:', result.error);
     }
   };
 
-  // Helper to check active state
   const isActive = (path: string) =>
     currentPath === `/dashboard/${path}` ||
     (currentPath === '/dashboard' && path === '');
 
+  const navGroup = (label: string) => (
+    <p className="mb-1.5 mt-5 px-3 text-[10px] font-bold uppercase tracking-widest text-[#2a5060]">
+      {label}
+    </p>
+  );
+
   return (
-    <div id="sidebar">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold">
-          {' '}
-          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
-        </h1>
+    <div id="sidebar" className="flex h-full flex-col px-3 py-6">
+      {/* Logo */}
+      <div className="mb-8 flex items-center justify-between px-3">
+        <div className="-mb-10">
+          <a href="/">
+            <img
+              src="/images/eduwaka-logo-white.png"
+              alt="EduWaka helps Nigerian students navigate university admissions with intelligent tools for institution search, course eligibility, fee estimation, and exam preparation."
+              className="h-28 w-28 object-contain"
+            />
+          </a>
+        </div>
         <button
-          className="text-gray-600 hover:text-gray-900 md:hidden"
+          className="rounded-lg p-1 text-[#2a5060] transition-colors hover:text-white md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         >
-          <X size={24} />
+          <X size={20} />
         </button>
       </div>
-      <div className="h-auto">
-        <nav className="custom-scrollbar max-h-[75vh] space-y-3 overflow-y-auto pr-2">
-          <SidebarItem
-            icon={<Home size={20} />}
-            label="Dashboard"
-            onClick={() => navigate('/dashboard')}
-            isActive={isActive('')}
-          />
-          <SidebarItem
-            icon={<Search size={20} />}
-            label="Search Institutions"
-            onClick={() => navigate('/dashboard/searchInstitutions')}
-            isActive={isActive('searchInstitutions')}
-          />
-          <SidebarItem
-            icon={<BookOpen size={20} />}
-            label="Search Courses"
-            onClick={() => navigate('/dashboard/searchCourses')}
-            isActive={isActive('searchCourses')}
-          />
-          <SidebarItem
-            icon={<ListChecks size={20} />}
-            label="Eligibility Checker (AI)"
-            onClick={() => navigate('/dashboard/eligibilityCheckerAI')}
-            isActive={isActive('eligibilityCheckerAI')}
-          />
-          <SidebarItem
-            icon={<Bot size={20} />}
-            label="Chatbot"
-            onClick={() => navigate('/dashboard/chatbot')}
-            isActive={isActive('chatbot')}
-          />
-          <SidebarItem
-            icon={<NairaIcon />}
-            label="Tuition/Fee Checker"
-            onClick={() => navigate('/dashboard/tuitionChecker')}
-            isActive={isActive('tuitionChecker')}
-          />
-          <SidebarItem
-            icon={<ListChecks size={20} />}
-            label="O'Level Combination Checker"
-            onClick={() => navigate('/dashboard/olevelCombination')}
-            isActive={isActive('olevelCombination')}
-          />
-          <SidebarItem
-            icon={<ListChecks size={20} />}
-            label="JAMB Combination Checker"
-            onClick={() => navigate('/dashboard/jambCombination')}
-            isActive={isActive('jambCombination')}
-          />
-          <SidebarItem
-            icon={<GraduationCap size={20} />}
-            label="Institution Overview"
-            onClick={() => navigate('/dashboard/institutionOverview')}
-            isActive={isActive('institutionOverview')}
-          />
-          <SidebarItem
-            icon={<Calendar size={20} />}
-            label="Admission Calendar"
-            onClick={() => navigate('/dashboard/admissionCalendar')}
-            isActive={isActive('admissionCalendar')}
-          />
-          <SidebarItem
-            icon={<Mail size={20} />}
-            label="Email Notifications"
-            onClick={() => navigate('/dashboard/emailNotifications')}
-            isActive={isActive('emailNotifications')}
-          />
-          <SidebarItem
-            icon={<HelpCircle size={20} />}
-            label="FAQ"
-            onClick={() => navigate('/dashboard/faqSection')}
-            isActive={isActive('faqSection')}
-          />
-          <SidebarItem
-            icon={<LifeBuoy size={20} />}
-            label="Support/Ask for Help"
-            onClick={() => navigate('/dashboard/supportHelpDesk')}
-            isActive={isActive('supportHelpDesk')}
-          />
-        </nav>
-      </div>
 
-      <div>
+      {/* Nav */}
+      <nav className="custom-scrollbar flex-1 overflow-y-auto">
+        {navGroup('Main')}
+        <SidebarItem
+          icon={<Home size={17} />}
+          label="Dashboard"
+          onClick={() => navigate('/dashboard')}
+          isActive={isActive('')}
+        />
+        <SidebarItem
+          icon={<Search size={17} />}
+          label="Search Institutions"
+          onClick={() => navigate('/dashboard/searchInstitutions')}
+          isActive={isActive('searchInstitutions')}
+        />
+        <SidebarItem
+          icon={<BookOpen size={17} />}
+          label="Search Courses"
+          onClick={() => navigate('/dashboard/searchCourses')}
+          isActive={isActive('searchCourses')}
+        />
+
+        {navGroup('AI Tools')}
+        <SidebarItem
+          icon={<ListChecks size={17} />}
+          label="Eligibility Checker"
+          onClick={() => navigate('/dashboard/eligibilityCheckerAI')}
+          isActive={isActive('eligibilityCheckerAI')}
+        />
+        <SidebarItem
+          icon={<Bot size={17} />}
+          label="Chatbot"
+          onClick={() => navigate('/dashboard/chatbot')}
+          isActive={isActive('chatbot')}
+        />
+        <SidebarItem
+          icon={<GraduationCap size={17} />}
+          label="Institution Overview"
+          onClick={() => navigate('/dashboard/institutionOverview')}
+          isActive={isActive('institutionOverview')}
+        />
+
+        {navGroup('Checkers')}
+        <SidebarItem
+          icon={<Banknote size={17} />}
+          label="Tuition / Fee Checker"
+          onClick={() => navigate('/dashboard/tuitionChecker')}
+          isActive={isActive('tuitionChecker')}
+        />
+        <SidebarItem
+          icon={<ListChecks size={17} />}
+          label="O'Level Combinations"
+          onClick={() => navigate('/dashboard/olevelCombination')}
+          isActive={isActive('olevelCombination')}
+        />
+        <SidebarItem
+          icon={<ListChecks size={17} />}
+          label="JAMB Combinations"
+          onClick={() => navigate('/dashboard/jambCombination')}
+          isActive={isActive('jambCombination')}
+        />
+
+        {navGroup('More')}
+        <SidebarItem
+          icon={<Calendar size={17} />}
+          label="Admission Calendar"
+          onClick={() => navigate('/dashboard/admissionCalendar')}
+          isActive={isActive('admissionCalendar')}
+        />
+        <SidebarItem
+          icon={<Mail size={17} />}
+          label="Email Notifications"
+          onClick={() => navigate('/dashboard/emailNotifications')}
+          isActive={isActive('emailNotifications')}
+        />
+        <SidebarItem
+          icon={<HelpCircle size={17} />}
+          label="FAQ"
+          onClick={() => navigate('/dashboard/faqSection')}
+          isActive={isActive('faqSection')}
+        />
+        <SidebarItem
+          icon={<LifeBuoy size={17} />}
+          label="Support"
+          onClick={() => navigate('/dashboard/supportHelpDesk')}
+          isActive={isActive('supportHelpDesk')}
+        />
+      </nav>
+
+      {/* Bottom */}
+      <div className="mt-4 border-t border-white/5 pt-4">
         {user ? (
           <button
             onClick={onLogoutClick}
-            className="mt-2 flex w-full items-center rounded-lg px-4 py-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
+            className="flex w-full items-center rounded-xl px-3 py-2.5 text-sm text-[#7eaab5] transition-colors hover:bg-red-900/20 hover:text-red-400"
           >
-            <LogOut size={20} className="mr-3" />
-            <span className="font-medium">Logout</span>
+            <LogOut size={17} className="mr-3" />
+            <span>Logout</span>
           </button>
         ) : (
-          <button>
-            <Link
-              to="/login"
-              className="mt-2 flex w-full items-center rounded-lg px-4 py-2 text-green-600 transition-colors duration-200 hover:bg-green-100"
-            >
-              <LogIn size={20} className="mr-3" />
-              <span className="font-medium">Login</span>
-            </Link>
-          </button>
+          <Link
+            to="/login"
+            className="flex w-full items-center rounded-xl px-3 py-2.5 text-sm text-[#7eaab5] transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <LogIn size={17} className="mr-3" />
+            <span>Login</span>
+          </Link>
         )}
       </div>
     </div>

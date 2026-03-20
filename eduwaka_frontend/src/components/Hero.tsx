@@ -1,138 +1,183 @@
-import Button from './ui/button';
-import { Search, Bot, CheckCircle } from 'lucide-react';
+import { Search, CheckCircle, Sparkles } from 'lucide-react';
 import heroIllustration from '../assets/illustration-grow-together.svg';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Hero = () => {
-  const [universitiesCount, setUniversitiesCount] = useState(0);
-  const [coursesCount, setCoursesCount] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-
+const useCount = (target: number, delay: number) => {
+  const [count, setCount] = useState(0);
   useEffect(() => {
-    const animateCount = (target: number, setter: (value: number) => void) => {
+    const timeout = setTimeout(() => {
       let current = 0;
-      const increment = target / 100;
+      const increment = target / 80;
       const timer = setInterval(() => {
         current += increment;
         if (current >= target) {
-          setter(target);
+          setCount(target);
           clearInterval(timer);
-        } else {
-          setter(Math.floor(current));
-        }
+        } else setCount(Math.floor(current));
       }, 20);
-    };
+      return () => clearInterval(timer);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [target, delay]);
+  return count;
+};
 
-    // Trigger animations after component mounts
-    setTimeout(() => setIsLoaded(true), 100);
-    setTimeout(() => animateCount(500, setUniversitiesCount), 800);
-    setTimeout(() => animateCount(1000, setCoursesCount), 900);
+const Hero = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
+  const universities = useCount(500, 800);
+  const courses = useCount(1000, 950);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoaded(true), 80);
+    return () => clearTimeout(t);
   }, []);
 
-  return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20 md:px-16">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gray-50 dark:bg-gray-800"></div>
-        <div className="bg-primary-500/20 absolute right-0 top-0 h-96 w-96 rounded-full blur-3xl"></div>{' '}
-        <div className="bg-secondary-500/20 absolute bottom-0 left-0 h-96 w-96 rounded-full blur-3xl"></div>{' '}
-      </div>
+  const anim = (delay = 0) =>
+    `transition-all duration-700 ease-out ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}` +
+    ` delay-[${delay}ms]`;
 
-      <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Content */}
+  return (
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white pt-16">
+      {/* Dot-grid background */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: `radial-gradient(#00252e 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
+        }}
+      />
+
+      {/* Glow blobs */}
+      <div className="bg-[#eb4799]/8 pointer-events-none absolute right-0 top-0 h-[500px] w-[500px] rounded-full blur-[120px]" />
+      <div className="bg-[#4853ea]/8 pointer-events-none absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full blur-[100px]" />
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 py-20 sm:px-8 lg:px-12">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          {/* ── Left: Copy ── */}
           <div className="text-center lg:text-left">
+            {/* Eyebrow pill */}
             <div
-              className={`mb-6 transition-all duration-1000 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`mb-6 ${anim(0)}`}
+              style={{ transitionDelay: '0ms' }}
             >
-              <span className="inline-flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm font-medium">
-                {' '}
-                <Bot className="mr-2 h-4 w-4" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-[#f3f4f6] px-4 py-2 text-xs font-semibold text-[#374151]">
                 AI-Powered University Admission Guide
               </span>
             </div>
 
+            {/* Headline */}
             <h1
-              className={`mb-6 text-4xl font-bold leading-tight text-gray-900 transition-all delay-200 duration-1000 dark:text-gray-100 md:text-5xl lg:text-6xl ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`mb-6 text-5xl font-extrabold leading-[1.1] tracking-tight text-[#111827] md:text-6xl lg:text-6xl ${anim(100)}`}
+              style={{ transitionDelay: '100ms' }}
             >
               Simplify Your
-              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {' '}
-                University Journey
+              <span className="mt-1 block">
+                <span className="text-[#eb4799]">University</span>{' '}
+                <span className="text-[#00252e]">Journey</span>
               </span>
             </h1>
 
+            {/* Subheading */}
             <p
-              className={`delay-400 text-md mb-8 max-w-2xl italic text-gray-700 transition-all duration-1000 dark:text-gray-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`mb-10 max-w-lg text-base leading-relaxed text-[#6b7280] lg:text-lg ${anim(200)}`}
+              style={{ transitionDelay: '200ms' }}
             >
               EduWaka helps Nigerian students navigate university admissions
               with intelligent tools for institution search, course eligibility,
               fee estimation, and exam preparation.
             </p>
 
+            {/* CTAs */}
             <div
-              className={`delay-600 mb-8 flex flex-col justify-center gap-4 transition-all duration-1000 sm:flex-row lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`mb-12 flex flex-col items-center gap-3 sm:flex-row lg:justify-start ${anim(300)}`}
+              style={{ transitionDelay: '300ms' }}
             >
-              <Button
-                size="lg"
-                variant="secondary"
-                className="px-8 py-4 text-lg transition-transform duration-200 hover:scale-105"
+              <button
+                onClick={() => navigate('/dashboard/searchInstitutions')}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#00252e] px-7 py-3.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#003a47] hover:shadow-lg active:scale-[0.98] sm:w-auto"
               >
-                <Search className="mr-2 h-5 w-5" />
+                <Search size={17} />
                 Explore Universities
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary-500 text-primary-500 dark:border-primary-300 dark:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900 border bg-transparent px-8 py-4 text-lg transition-all duration-200 hover:scale-105"
+              </button>
+              <button
+                onClick={() => navigate('/dashboard/eligibilityCheckerAI')}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#eb4799] px-7 py-3.5 text-sm font-bold text-[#eb4799] transition-all hover:-translate-y-0.5 hover:bg-[#eb4799] hover:text-white hover:shadow-lg active:scale-[0.98] sm:w-auto"
               >
-                <CheckCircle className="mr-2 h-5 w-5" />
+                <CheckCircle size={17} />
                 Check Eligibility
-              </Button>
+              </button>
             </div>
 
+            {/* Stats */}
             <div
-              className={`delay-800 flex items-center justify-center space-x-8 text-gray-700 transition-all duration-1000 dark:text-gray-300 lg:justify-start ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+              className={`flex items-center justify-center gap-8 lg:justify-start ${anim(400)}`}
+              style={{ transitionDelay: '400ms' }}
             >
-              <div className="text-center">
-                <div className="text-2xl font-bold">{universitiesCount}+</div>
-                <div className="text-sm">Universities</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{coursesCount}+</div>
-                <div className="text-sm">Courses</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">AI</div>
-                <div className="text-sm">Powered</div>
-              </div>
+              {[
+                { value: `${universities}+`, label: 'Universities' },
+                { value: `${courses}+`, label: 'Courses' },
+                { value: 'AI', label: 'Powered' },
+              ].map((stat, i) => (
+                <div
+                  key={stat.label}
+                  className="flex flex-col items-center lg:items-start"
+                >
+                  <span className="text-2xl font-extrabold text-[#111827]">
+                    {stat.value}
+                  </span>
+                  <span className="text-xs text-[#9ca3af]">{stat.label}</span>
+                  {i < 2 && <div className="absolute" />}
+                </div>
+              ))}
             </div>
           </div>
-          {/* Image */}
+
+          {/* ── Right: Illustration ── */}
           <div
-            className={`duration-1200 relative transition-all delay-300 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}
+            className={`relative transition-all duration-1000 ease-out ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}`}
+            style={{ transitionDelay: '200ms' }}
           >
-            <div className="shadow-elegant relative z-10 overflow-hidden rounded-2xl">
-              <img
-                src={heroIllustration}
-                alt="Nigerian students studying with modern technology"
-                className="h-full w-full transform object-cover transition-transform duration-700 hover:scale-105"
-              />
+            {/* Card frame */}
+            <div className="relative">
+              {/* Decorative rings */}
+              <div className="absolute -inset-4" />
+              <div className="absolute -inset-8" />
+
+              {/* Main image card */}
+              <div className="relative z-10 overflow-hidden">
+                <img
+                  src={heroIllustration}
+                  alt="Nigerian students navigating university admissions"
+                  className="h-full w-full transform object-cover transition-transform duration-700 hover:scale-[1.03]"
+                />
+              </div>
+
+              {/* Floating badge — top left */}
+              <div className="absolute -left-5 -top-4 z-20 flex items-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 shadow-lg">
+                <Sparkles size={14} className="text-[#eb4799]" />
+                <span className="text-xs font-bold text-[#111827]">
+                  AI-Powered
+                </span>
+              </div>
+
+              {/* Floating badge — bottom right */}
+              <div className="absolute -bottom-4 -right-5 z-20 flex items-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 shadow-lg">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00252e] text-[10px] font-bold text-white">
+                  ✓
+                </span>
+                <span className="text-xs font-bold text-[#111827]">
+                  500+ Institutions
+                </span>
+              </div>
+
+              {/* Indigo accent block */}
+              <div className="bg-[#4853ea]/8 absolute -bottom-3 -left-3 -z-10 h-full w-full rounded-2xl" />
             </div>
           </div>
         </div>
       </div>
-
-      {/* Curved bottom edge */}
-      {/* <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-        <svg
-          className="relative block h-20 w-full fill-[hsl(192,100%,9%)] dark:fill-black"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,60 C300,150 900,-30 1200,60 L1200,120 L0,120 Z"></path>
-        </svg>
-      </div> */}
     </section>
   );
 };

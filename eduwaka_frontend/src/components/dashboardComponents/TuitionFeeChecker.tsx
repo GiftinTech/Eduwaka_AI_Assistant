@@ -1,141 +1,102 @@
 import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import {
+  Card,
+  InfoBanner,
+  Input,
+  PageHeader,
+  PrimaryButton,
+  ResultCard,
+  SectionLabel,
+  WarningBanner,
+} from './DashboardComponents';
 
-type CourseFees = {
-  [course: string]: string;
-  default: string;
-};
-
-type FeesData = {
-  [institution: string]: CourseFees;
-};
-
+// ─── TuitionFeeChecker ───────────────────────────────────────
+type CourseFees = { [course: string]: string; default: string };
+type FeesData = { [institution: string]: CourseFees };
 const feesData: FeesData = {
   'university of ibadan': {
-    medicine: 'N350,000 per session',
-    surgery: 'N350,000 per session',
-    law: 'N250,000 per session',
-    'computer science': 'N200,000 per session',
-    default: 'N180,000 - N250,000 per session (general estimate)',
+    medicine: '₦350,000 per session',
+    surgery: '₦350,000 per session',
+    law: '₦250,000 per session',
+    'computer science': '₦200,000 per session',
+    default: '₦180,000 – ₦250,000 per session',
   },
   'university of lagos': {
-    medicine: 'N300,000 per session',
-    surgery: 'N300,000 per session',
-    accounting: 'N150,000 per session',
-    default: 'N120,000 - N200,000 per session (general estimate)',
+    medicine: '₦300,000 per session',
+    surgery: '₦300,000 per session',
+    accounting: '₦150,000 per session',
+    default: '₦120,000 – ₦200,000 per session',
   },
   'federal university of technology, akure': {
-    engineering: 'N170,000 per session',
-    default: 'N100,000 - N150,000 per session (general estimate)',
+    engineering: '₦170,000 per session',
+    default: '₦100,000 – ₦150,000 per session',
   },
   'university of calabar': {
-    'social works': 'N80,000 - N120,000 per session',
-    default: 'N70,000 - N150,000 per session (general estimate for Unical)',
+    'social works': '₦80,000 – ₦120,000 per session',
+    default: '₦70,000 – ₦150,000 per session',
   },
 };
 
-const TuitionFeeChecker = () => {
-  const [institutionInput, setInstitutionInput] = useState<string>('');
-  const [courseInput, setCourseInput] = useState<string>('');
-  const [feeResult, setFeeResult] = useState<string>('');
+export const TuitionFeeChecker = () => {
+  const [institution, setInstitution] = useState('');
+  const [course, setCourse] = useState('');
+  const [result, setResult] = useState('');
 
-  const handleCheckFees = () => {
-    const lowerCaseInstitution = institutionInput.toLowerCase();
-    const lowerCaseCourse = courseInput.toLowerCase();
-
-    let estimatedFee =
-      'Fees vary greatly by institution and course. Please check the official website.';
-
-    if (feesData[lowerCaseInstitution]) {
-      estimatedFee =
-        feesData[lowerCaseInstitution][lowerCaseCourse] ||
-        feesData[lowerCaseInstitution].default;
-    } else {
-      estimatedFee = `Fees vary greatly by institution and course. Please check the official website of ${institutionInput || 'the institution'}.`;
-    }
-
-    setFeeResult(
-      `Estimated fee for ${courseInput || 'your chosen course'} at ${institutionInput || 'the specified institution'}: ${estimatedFee}`,
+  const check = () => {
+    const inst = feesData[institution.toLowerCase()];
+    const fee = inst
+      ? (inst[course.toLowerCase()] ?? inst.default)
+      : `Please check the official website of ${institution || 'the institution'}.`;
+    setResult(
+      `${course || 'Your chosen course'} at ${institution || 'the specified institution'}: ${fee}`,
     );
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleCheckFees();
-    }
   };
 
   return (
     <div>
-      <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        Tuition/Fee Checker
-      </h2>
-      <p className="text-gray-700">
-        Estimate tuition fees and other charges for various courses and
-        institutions.
-      </p>
-      <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <label
-          htmlFor="institution"
-          className="mb-1 block text-sm font-medium text-gray-700"
-        >
-          Institution
-        </label>
-        <input
-          type="text"
+      <PageHeader
+        title="Tuition / Fee Checker"
+        subtitle="Estimate tuition fees and charges for various courses and institutions."
+      />
+      <Card className="space-y-4">
+        <Input
           id="institution"
+          label="Institution"
           placeholder="e.g., University of Ibadan"
-          className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-          value={institutionInput}
+          value={institution}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setInstitutionInput(e.target.value)
+            setInstitution(e.target.value)
           }
         />
-
-        <label
-          htmlFor="course"
-          className="mb-1 block text-sm font-medium text-gray-700"
-        >
-          Course
-        </label>
-        <input
-          type="text"
+        <Input
           id="course"
+          label="Course"
           placeholder="e.g., Law"
-          className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-          value={courseInput}
+          value={course}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setCourseInput(e.target.value)
+            setCourse(e.target.value)
           }
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+            e.key === 'Enter' && check()
+          }
         />
-
-        <button
-          onClick={handleCheckFees}
-          className="w-full rounded-lg bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700"
-        >
-          Check Fees
-        </button>
-
-        {feeResult && (
-          <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-            <p className="text-gray-600">{feeResult}</p>
-            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-              <p className="text-red-600">
-                ⚠ <span className="font-bold">Note:</span> This result may not
-                be accurate. Always confirm from the institution's website as
-                fees are bound to change every session.
-              </p>
-            </div>
-            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-              <p className="text-gray-800">
-                ℹ <span className="font-bold">Info:</span> More institution
-                will be covered soon. This is just an MVP.
-              </p>
-            </div>
-          </div>
+        <PrimaryButton onClick={check}>Check Fees</PrimaryButton>
+        {result && (
+          <ResultCard>
+            <SectionLabel>Estimated Fee</SectionLabel>
+            <p className="text-sm font-semibold text-[#111827]">{result}</p>
+            <WarningBanner>
+              This result may not be accurate. Always confirm from the
+              institution's website as fees change every session.
+            </WarningBanner>
+            <InfoBanner>
+              More institutions will be covered soon. This is just an MVP.
+            </InfoBanner>
+          </ResultCard>
         )}
-      </div>
+      </Card>
     </div>
   );
 };
+
 export default TuitionFeeChecker;

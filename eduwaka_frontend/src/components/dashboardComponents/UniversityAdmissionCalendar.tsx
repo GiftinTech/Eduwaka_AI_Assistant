@@ -1,40 +1,44 @@
 import { Calendar } from 'lucide-react';
 
+import {
+  PageHeader,
+  Card,
+  InfoBanner,
+  SectionLabel,
+} from './DashboardComponents';
 const UniversityAdmissionCalendar = () => (
   <div>
-    <h2 className="mb-6 text-3xl font-bold text-gray-900">
-      University Admission Calendar
-    </h2>
-    <p className="text-gray-700">
-      Stay updated with important dates for JAMB, Post-UTME and admission
-      deadlines across various institutions.
-    </p>
-    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-      <p className="text-gray-600">
-        Calendar events will be displayed here, showing key admission dates.
-      </p>
-      <ul className="mt-4 space-y-2">
-        <li className="flex items-center text-gray-700">
-          <Calendar size={18} className="mr-2 text-blue-500" /> JAMB
-          Registration: Dates TBD
-        </li>
-        <li className="flex items-center text-gray-700">
-          <Calendar size={18} className="mr-2 text-blue-500" /> Post-UTME
-          Screening: Varies by institution
-        </li>
-        <li className="flex items-center text-gray-700">
-          <Calendar size={18} className="mr-2 text-blue-500" /> Admission List
-          Release: Varies by institution
-        </li>
+    <PageHeader
+      title="Admission Calendar"
+      subtitle="Stay updated with important dates for JAMB, Post-UTME and admission deadlines."
+      badge="2025/2026 Session"
+    />
+    <Card>
+      <SectionLabel>Key Dates</SectionLabel>
+      <ul className="space-y-3">
+        {[
+          { label: 'JAMB Registration', value: 'Dates TBD' },
+          { label: 'Post-UTME Screening', value: 'Varies by institution' },
+          { label: 'Admission List Release', value: 'Varies by institution' },
+        ].map((item) => (
+          <li
+            key={item.label}
+            className="flex items-center justify-between rounded-xl border border-[#e5e7eb] px-4 py-3"
+          >
+            <span className="flex items-center gap-3 text-sm font-medium text-[#111827]">
+              <Calendar size={15} className="text-[#4853ea]" />
+              {item.label}
+            </span>
+            <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-xs text-[#6b7280]">
+              {item.value}
+            </span>
+          </li>
+        ))}
       </ul>
-    </div>
-    <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-      <p className="text-gray-700">
-        ℹ <span className="font-bold">Info:</span> More details will be covered
-        soon. This is just an MVP.
-      </p>
-    </div>
+      <InfoBanner>
+        More details will be covered soon. This is just an MVP.
+      </InfoBanner>
+    </Card>
   </div>
 );
-
 export default UniversityAdmissionCalendar;

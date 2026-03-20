@@ -76,6 +76,15 @@ INSTALLED_APPS = [
     'apps.ai_assistant',
     'core',
 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +92,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'allauth.account.middleware.AccountMiddleware', 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -207,6 +217,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'], # For filtering
 }
 
+REST_AUTH = {
+    'TOKEN_MODEL': None
+}
+
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
@@ -248,6 +262,17 @@ SIMPLE_JWT = {
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # use SMTP in production
 
 EDUWAKA_FRONTEND_URL = 'http://localhost:5173/'  
+
+# social signup site id
+SITE_ID = 1
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY':    os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
 
 # For prod email sending, use the following:
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')

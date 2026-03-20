@@ -18,8 +18,14 @@ from django.db import OperationalError, DatabaseError
 from rest_framework.parsers import MultiPartParser, FormParser
 import socket
 from django.http import JsonResponse
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 User = get_user_model()
+
+# Google login
+class GoogleLogin(SocialLoginView):
+  adapter_class = GoogleOAuth2Adapter
 
 # LoginViewSet
 class LoginViewSet(APIView):
@@ -31,15 +37,15 @@ class LoginViewSet(APIView):
       serializer = self.serializer_class(data=request.data)
       serializer.is_valid(raise_exception=True)
 
-      username = serializer.validated_data['username']
+      email = serializer.validated_data['email']
       password = serializer.validated_data['password']
 
 
       try:
-        user = User.objects.get(username=username)
+        user = User.objects.get(email=email)
       except User.DoesNotExist:
         return Response(
-          {"detail": "Invalid username or password."},
+          {"detail": "Invalid email or password."},
           status=status.HTTP_401_UNAUTHORIZED
         )
     
@@ -75,7 +81,7 @@ class LoginViewSet(APIView):
         return Response(jwt_serializer.validated_data, status=status.HTTP_200_OK)
       
       return Response(
-        {"detail": "Invalid username or password."},
+        {"detail": "Invalid email or password."},
         status=status.HTTP_401_UNAUTHORIZED
       )
     except (OperationalError, DatabaseError) as e:

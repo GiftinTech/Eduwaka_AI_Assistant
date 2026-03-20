@@ -12,27 +12,30 @@ User = get_user_model() # Get current active user
 
 # Login Serializer
 class LoginSerializer(serializers.Serializer):
-  username = serializers.CharField(required=True)
+  email = serializers.CharField(required=True)
   password = serializers.CharField(required=True, style={'input_type': 'password'})
 
 # Serializer for User Registration
 class RegisterSerializer(serializers.ModelSerializer):
-  password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+  password = serializers.CharField(write_only=True)
 
   class Meta:
     model = UserProfile
-    fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name')
-    extra_kwargs = {
-      'first_name': {'required': True},
-      'last_name': {'required': True},
-      'email': {'required': True},
-      'password': {'write_only': True}
-    }
-
+    fields = ('id', 'email', 'password')
+  
   def create(self, validated_data):
-    validated_data['password'] = make_password(validated_data['password'])
-    return super().create(validated_data)
-
+    email = validated_data['email']
+    
+    user = UserProfile.objects.create(
+      email=email,
+      username=email.split('@')[0],  # auto-generate username
+    )
+    
+    user.set_password(validated_data['password'])
+    user.save()
+    
+    return user
+  
 class UserProfileSerializer(serializers.ModelSerializer):
   photo_url = serializers.SerializerMethodField(read_only=True)
 
@@ -41,14 +44,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
     fields = ('id', 'username', 'email', 'first_name', 'last_name', 'photo', 'photo_url')
 
   def get_photo_url(self, obj):
-    if obj.photo:
-      request = self.context.get('request')
-      if request:
-        return request.build_absolute_uri(obj.photo.url)
-      else:
-        # Fallback for when request context isn't available
-        return f"{settings.MEDIA_URL}{obj.photo}"
-    return None
+    if not obj.photo:
+        return None
+    
+    url = obj.photo.url  
+    
+    # Only prepend host for local relative URLs
+    if url.startswith('http'):
+        return url 
+    
+    # Local dev fallback
+    request = self.context.get('request')
+    if request:
+        return request.build_absolute_uri(url)
+    
+    return f"{settings.MEDIA_URL}{obj.photo}"
 
 # Change pwd 
 class ChangePasswordSerializer(serializers.Serializer):

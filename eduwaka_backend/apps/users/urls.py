@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from apps.users.views import UserProfileViewSet, UserListViewSet, DeleteUserViewSet, UserUpdateViewSet, ChangePasswordViewSet, ForgotPasswordViewSet, ResetPasswordViewSet, LoginViewSet
+from apps.users.views import UserProfileViewSet, UserListViewSet, DeleteUserViewSet, UserUpdateViewSet, ChangePasswordViewSet, ForgotPasswordViewSet, ResetPasswordViewSet, LoginViewSet, GoogleLogin
 from apps.users.serializers import RegisterSerializer # Import the serializer for registration
 from rest_framework_simplejwt.views import TokenRefreshView # Import JWT views
 from rest_framework.generics import CreateAPIView # For registration view
@@ -20,6 +20,9 @@ urlpatterns = [
 
   # User Registration
   path('register/', CreateAPIView.as_view(serializer_class=RegisterSerializer, permission_classes=(AllowAny,)), name='register'),
+
+  # Social login
+  path('auth/google/', GoogleLogin.as_view(), name='google_login'),
 
   # Get all api/users is Admin access only
   path('users/', UserListViewSet.as_view(), name='user-list'),

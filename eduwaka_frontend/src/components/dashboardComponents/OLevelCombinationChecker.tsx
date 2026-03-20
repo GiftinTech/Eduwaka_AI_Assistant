@@ -1,94 +1,77 @@
 import { useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import {
+  Card,
+  InfoBanner,
+  Input,
+  PageHeader,
+  PrimaryButton,
+  ResultCard,
+  SectionLabel,
+} from './DashboardComponents';
 
-const OLevelCombinationChecker = () => {
-  const [courseName, setCourseName] = useState<string>('');
-  const [combinationResult, setCombinationResult] = useState<string>('');
+export const OLevelCombinationChecker = () => {
+  const [courseName, setCourseName] = useState('');
+  const [result, setResult] = useState('');
 
-  const handleCheckCombination = () => {
-    const lowerCaseCourse = courseName.toLowerCase();
-    if (
-      lowerCaseCourse.includes('medicine') ||
-      lowerCaseCourse.includes('surgery')
-    ) {
-      setCombinationResult(
-        "For Medicine and Surgery, typical O'Level subjects are English Language, Mathematics, Physics, Chemistry, and Biology (all with at least C6).",
+  const check = () => {
+    const lc = courseName.toLowerCase();
+    if (lc.includes('medicine') || lc.includes('surgery'))
+      setResult(
+        'English Language, Mathematics, Physics, Chemistry, and Biology — all at least C6.',
       );
-    } else if (lowerCaseCourse.includes('computer science')) {
-      setCombinationResult(
-        "For Computer Science, typical O'Level subjects are English Language, Mathematics, Physics, Chemistry, and one other Science subject (e.g., Biology, Further Mathematics) (all with at least C6).",
+    else if (lc.includes('computer science'))
+      setResult(
+        'English Language, Mathematics, Physics, Chemistry, and one other Science subject — all at least C6.',
       );
-    } else if (lowerCaseCourse.includes('law')) {
-      setCombinationResult(
-        "For Law, typical O'Level subjects are English Language, Literature in English, Government, Economics/History, and one other Arts/Social Science subject (all with at least C6).",
+    else if (lc.includes('law'))
+      setResult(
+        'English Language, Literature in English, Government, Economics/History, and one other Arts/Social Science subject — all at least C6.',
       );
-    } else if (lowerCaseCourse.includes('mass communication')) {
-      setCombinationResult(
-        "For Mass Communication, typical O'Level subjects are English Language, Mathematics, Literature in English, Government/History/Economics, and one other Arts/Social Science subject (all with at least C6).",
+    else if (lc.includes('mass communication'))
+      setResult(
+        'English Language, Mathematics, Literature in English, Government/History/Economics, and one other Arts/Social Science subject — all at least C6.',
       );
-    } else if (lowerCaseCourse.includes('english')) {
-      setCombinationResult(
-        "For English Language and Literature, typical O'Level subjects are English Language, Mathematics, Literature in English, and two other Arts/Social Science subjects (all with at least C6).",
+    else if (lc.includes('english'))
+      setResult(
+        'English Language, Mathematics, Literature in English, and two other Arts/Social Science subjects — all at least C6.',
       );
-    } else {
-      setCombinationResult(
-        "No specific O'Level combination found for this course in our mock data. Please consult the institution's official brochure.",
+    else
+      setResult(
+        "No specific combination found. Please consult the institution's official brochure.",
       );
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleCheckCombination();
-    }
   };
 
   return (
     <div>
-      <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        O'Level Subject Combination Checker
-      </h2>
-      <p className="text-gray-700">
-        Check the required O'Level subject combinations for your desired
-        courses.
-      </p>
-      <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        <label
-          htmlFor="courseOLevel"
-          className="mb-1 block text-sm font-medium text-gray-700"
-        >
-          Course
-        </label>
-        <input
-          type="text"
+      <PageHeader
+        title="O'Level Combination Checker"
+        subtitle="Check the required O'Level subject combinations for your desired course."
+      />
+      <Card className="space-y-4">
+        <Input
           id="courseOLevel"
+          label="Course Name"
           placeholder="e.g., Mass Communication"
-          className="mb-4 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
           value={courseName}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setCourseName(e.target.value)
           }
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) =>
+            e.key === 'Enter' && check()
+          }
         />
-        <button
-          onClick={handleCheckCombination}
-          className="w-full rounded-lg bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700"
-        >
-          Check Combination
-        </button>
-        {combinationResult && (
-          <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-            <p className="text-gray-600">{combinationResult}</p>
-            <div className="mt-4 rounded-lg border border-gray-200 bg-white p-3">
-              <p className="text-gray-800">
-                ℹ <span className="font-bold">Info:</span> More courses will be
-                covered soon. This is just an MVP.
-              </p>
-            </div>
-          </div>
+        <PrimaryButton onClick={check}>Check Combination</PrimaryButton>
+        {result && (
+          <ResultCard>
+            <SectionLabel>Required Subjects</SectionLabel>
+            <p className="text-sm leading-relaxed text-[#111827]">{result}</p>
+            <InfoBanner>
+              More courses will be covered soon. This is just an MVP.
+            </InfoBanner>
+          </ResultCard>
         )}
-      </div>
+      </Card>
     </div>
   );
 };
-
 export default OLevelCombinationChecker;

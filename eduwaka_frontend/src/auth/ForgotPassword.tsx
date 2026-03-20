@@ -1,32 +1,42 @@
-import { useState, type FormEvent, type ChangeEvent } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { useState, type FormEvent, type ChangeEvent, useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEffect } from 'react';
-import Button from '../components/ui/button';
+
+const Spinner = () => (
+  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+    />
+  </svg>
+);
 
 const ForgotPassword = () => {
-  // Access auth functions and state from the context
   const { handleForgotPassword, loadingAuth, user } = useAuth();
 
-  // State for the password reset form
-  const [resetEmail, setResetEmail] = useState<string>('');
-  const [resetMessage, setResetMessage] = useState<string>('');
-  const [formAuthError, setFormAuthError] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
+  const [formAuthError, setFormAuthError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [focused, setFocused] = useState(false);
 
-  // Hook for navigation
   const navigate = useNavigate();
 
-  // If a user is already logged in, navigate them away from this page
   useEffect(() => {
-    if (user) {
-      navigate('/');
-    }
+    if (user) navigate('/');
   }, [user, navigate]);
 
-  // Handle password reset form submission
-  const handleForgotPasswordSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setResetMessage('');
@@ -37,90 +47,133 @@ const ForgotPassword = () => {
     if (result.success) {
       setResetMessage(
         result.message ||
-          'If an account with that email exists, a password reset link has been sent.',
+          'If an account with that email exists, a reset link has been sent.',
       );
-      setFormAuthError(''); // Clear any previous errors on success
       setResetEmail('');
     } else {
-      setResetMessage(''); // Clear any previous success messages
       setFormAuthError(
-        result.message ||
-          'Failed to send password reset email. Please try again.',
+        result.message || 'Failed to send reset email. Please try again.',
       );
     }
 
     setIsSubmitting(false);
   };
 
+  const isLoading = isSubmitting || loadingAuth;
+
   return (
-    <div className="flex min-h-screen animate-swirl items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4">
-      <div className="relative w-full max-w-md transform rounded-2xl bg-white p-8 shadow-2xl transition-all duration-300 hover:scale-[1.02] dark:bg-gray-800">
-        <button
-          onClick={() => navigate('/login')}
-          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
-          aria-label="Back to Login"
-        >
-          <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
-        </button>
-        <h2 className="mb-8 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
-        </h2>
-        <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
-          Reset Your Password
-        </p>
-        <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
-          <p className="mb-4 text-center text-gray-600 dark:text-gray-300">
-            Enter your email to receive a password reset link.
-          </p>
-          <div>
-            <label
-              htmlFor="resetEmail"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="resetEmail"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-              placeholder="you@example.com"
-              value={resetEmail}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setResetEmail(e.target.value)
-              }
-              required
-              disabled={isSubmitting || loadingAuth}
-            />
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0f] px-4 font-mono">
+      {/* Grid background */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        // style={{
+        //   backgroundImage: `linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px)`,
+        //   backgroundSize: '48px 48px',
+        // }}
+      />
+      <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-[#eb4799]/10 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-1/4 right-1/3 h-56 w-56 rounded-full bg-[#4853ea]/10 blur-[80px]" />
+
+      <button
+        onClick={() => navigate('/login')}
+        disabled={isLoading}
+        className="absolute left-6 top-6 flex items-center gap-2 text-xs tracking-widest text-zinc-500 transition-colors hover:text-[#eb4799] disabled:opacity-40"
+      >
+        <ArrowLeft size={14} /> BACK
+      </button>
+
+      <div className="relative w-full max-w-sm">
+        {/* Header */}
+        <div className="mb-10 text-center">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <a href="/">
+              <img
+                src="/images/eduwaka-logo-white.png"
+                alt="EduWaka helps Nigerian students navigate university admissions with intelligent tools for institution search, course eligibility, fee estimation, and exam preparation."
+                className="h-28 w-28 object-contain"
+              />
+            </a>
           </div>
-          {resetMessage && (
-            <p className="rounded-md bg-green-50 p-2 text-center text-sm text-green-600 dark:bg-green-900 dark:text-green-300">
-              {resetMessage}
-            </p>
-          )}
-          {formAuthError && (
-            <p className="rounded-md bg-red-50 p-2 text-center text-sm text-red-600 dark:bg-red-900 dark:text-red-300">
-              {formAuthError}
-            </p>
-          )}
-          <button
-            type="submit"
-            className="w-full transform rounded-lg bg-blue-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-400"
-            disabled={isSubmitting || loadingAuth}
-          >
-            {isSubmitting || loadingAuth ? 'Sending...' : 'Send Reset Link'}
-          </button>
-        </form>
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-300">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Forgot your password?
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-sm">
+          <p className="mb-6 text-center text-sm leading-relaxed text-zinc-400">
+            Enter your email address and we'll send you a link to reset your
+            password.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="resetEmail"
+                className={`block text-[11px] uppercase tracking-widest transition-colors ${focused ? 'text-[#eb4799]' : 'text-zinc-500'}`}
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="resetEmail"
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-all focus:border-[#eb4799]/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-[#eb4799]/30 disabled:cursor-not-allowed disabled:opacity-40"
+                placeholder="you@example.com"
+                value={resetEmail}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setResetEmail(e.target.value)
+                }
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                required
+                disabled={isLoading}
+                autoComplete="email"
+              />
+            </div>
+
+            {/* Success */}
+            {resetMessage && (
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+                <p className="text-center text-xs text-emerald-400">
+                  {resetMessage}
+                </p>
+              </div>
+            )}
+
+            {/* Error */}
+            {formAuthError && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
+                <p className="text-center text-xs text-red-400">
+                  {formAuthError}
+                </p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-2 w-full rounded-lg bg-[#eb4799] py-3 text-sm font-bold tracking-wider text-white transition-all hover:bg-[#d43589] focus:outline-none focus:ring-2 focus:ring-[#eb4799]/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner /> SENDING...
+                </span>
+              ) : (
+                'SEND RESET LINK'
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-zinc-600">
           Remembered your password?{' '}
-          <Button
-            variant="link"
+          <button
             type="button"
             onClick={() => navigate('/login')}
-            className="font-medium text-blue-600 transition-colors hover:text-blue-800 focus:outline-none dark:text-blue-400 dark:hover:text-blue-600"
-            disabled={isSubmitting || loadingAuth}
+            className="text-[#eb4799] transition-colors hover:text-[#d43589]"
+            disabled={isLoading}
           >
-            Log in here
-          </Button>
+            Back to login
+          </button>
         </p>
       </div>
     </div>

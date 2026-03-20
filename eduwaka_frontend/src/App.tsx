@@ -21,7 +21,7 @@ import InstitutionOverview from './components/dashboardComponents/InstitutionOve
 import UniversityAdmissionCalendar from './components/dashboardComponents/UniversityAdmissionCalendar';
 import EmailNotifications from './components/dashboardComponents/EmailNotifications';
 import FAQSection from './components/dashboardComponents/FAQSection';
-import SupportHelpDesk from './components/dashboardComponents/SupportHelpDest';
+import SupportHelpDesk from './components/dashboardComponents/SupportHelpDesk';
 import Chatbot from './components/dashboardComponents/Chatbot';
 import { AlertProvider } from './context/AlertContext';
 import AlertContainer from './utils/alert';

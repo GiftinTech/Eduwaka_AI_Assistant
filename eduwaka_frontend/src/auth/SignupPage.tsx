@@ -1,33 +1,76 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react';
-import { ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Button from '../components/ui/button';
 import { useAlert } from '../hooks/useAlert';
 
+const GoogleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <path
+      d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
+      fill="#4285F4"
+    />
+    <path
+      d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"
+      fill="#34A853"
+    />
+    <path
+      d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+      fill="#FBBC05"
+    />
+    <path
+      d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"
+      fill="#EA4335"
+    />
+  </svg>
+);
+
+const Spinner = () => (
+  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+    />
+  </svg>
+);
+
 const Signup = () => {
-  // Access auth functions and state from the context
-  const { handleSignup, loadingAuth } = useAuth();
+  // RegisterSerializer only needs: email + password (username auto-generated from email)
+  const { handleSignup, handleGoogleLogin, loadingAuth } = useAuth();
   const { showAlert } = useAlert();
 
-  // State for all signup form inputs and submission status
-  const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [formAuthError, setFormAuthError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // UX states for Login
+  const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
 
-  // Hook for navigation
   const navigate = useNavigate();
+  const isLoading = isSubmitting || loadingAuth || isGoogleLoading;
 
-  // Handle form submission
+  const checks = [
+    { label: 'At least 8 characters', pass: password.length >= 8 },
+    { label: 'Contains a number', pass: /\d/.test(password) },
+    {
+      label: 'Passwords match',
+      pass: password.length > 0 && password === confirmPassword,
+    },
+  ];
+  const allChecksPassed = checks.every((c) => c.pass);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -38,221 +81,251 @@ const Signup = () => {
       setIsSubmitting(false);
       return;
     }
+    if (password.length < 8) {
+      setFormAuthError('Password must be at least 8 characters.');
+      setIsSubmitting(false);
+      return;
+    }
 
-    // Call the signup function from the context with all user data
-    const result = await handleSignup(
-      username,
-      email,
-      password,
-      firstName,
-      lastName,
-    );
+    // Only email + password — RegisterSerializer auto-generates username
+    const result = await handleSignup(email, password);
 
     if (result.success) {
-      // Clear all form inputs on successful signup
-      setUsername('');
       setEmail('');
       setPassword('');
-      setFirstName('');
-      setLastName('');
       setConfirmPassword('');
-      // Navigate to the home page after successful signup/login
       navigate('/dashboard');
       showAlert(
         'success',
         'Welcome to the eduwaka family! We are delighted to have you 😊',
       );
     } else {
-      // Display the error message from the API
       setFormAuthError(result.error || 'An unknown error occurred.');
     }
-
     setIsSubmitting(false);
   };
 
+  const handleGoogleSignUp = async () => {
+    setIsGoogleLoading(true);
+    setFormAuthError('');
+    try {
+      const result = await handleGoogleLogin();
+      if (!result.success && result.error) {
+        setFormAuthError(result.error);
+      }
+    } catch {
+      setFormAuthError('Google sign-up failed. Please try again.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen animate-swirl items-center justify-center bg-[linear-gradient(135deg,_#6366f1,_#a855f7,_#6366f1)] bg-[length:400%_400%] px-4 py-5">
-      <div className="relative w-full rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800 sm:max-w-lg">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/')}
-          className="absolute left-4 top-4 flex items-center text-gray-600 transition-colors hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400"
-          aria-label="Back to Landing Page"
-        >
-          <ChevronRight size={20} className="mr-1 rotate-180 transform" /> Back
-        </Button>
-        <h2 className="my-5 text-center text-4xl font-extrabold text-gray-900 dark:text-gray-50">
-          edu<span className="text-pink-600 dark:text-pink-400">waka</span>
-        </h2>
-        <p className="mb-6 text-center text-lg text-gray-600 dark:text-gray-300">
-          Create your edu
-          <span className="text-pink-600 dark:text-pink-400">waka</span> account
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="username"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-              placeholder="Your username"
-              value={username}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setUsername(e.target.value)
-              }
-              required
-              disabled={isSubmitting || loadingAuth}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0f] px-4 py-8 font-mono">
+      <div
+        className="pointer-events-none absolute inset-0"
+        // style={{
+        //   backgroundImage: `linear-gradient(rgba(99,102,241,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.07) 1px, transparent 1px)`,
+        //   backgroundSize: '48px 48px',
+        // }}
+      />
+      <div className="pointer-events-none absolute right-1/4 top-1/3 h-72 w-72 rounded-full bg-indigo-600/20 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-1/3 left-1/4 h-56 w-56 rounded-full bg-pink-500/15 blur-[80px]" />
+
+      <button
+        onClick={() => navigate('/')}
+        disabled={isLoading}
+        className="absolute left-6 top-6 flex items-center gap-2 text-xs tracking-widest text-zinc-500 transition-colors hover:text-indigo-400 disabled:opacity-40"
+      >
+        <ArrowLeft size={14} /> BACK
+      </button>
+
+      <div className="relative w-full max-w-sm">
+        <div className="mb-10 text-center">
+          <div className="mt-3 inline-flex items-center gap-2">
+            <img
+              src="/images/eduwaka-logo-white.png"
+              alt="EduWaka helps Nigerian students navigate university admissions with intelligent tools for institution search, course eligibility, fee estimation, and exam preparation."
+              className="h-28 w-28 object-contain"
             />
           </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              required
-              disabled={isSubmitting || loadingAuth}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div>
-              <label
-                htmlFor="firstName"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-              >
-                First Name
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-                placeholder="John"
-                value={firstName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setFirstName(e.target.value)
-                }
-                required
-                disabled={isSubmitting || loadingAuth}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="lastName"
-                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-              >
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-                placeholder="Doe"
-                value={lastName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setLastName(e.target.value)
-                }
-                required
-                disabled={isSubmitting || loadingAuth}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
-                required
-                disabled={isSubmitting || loadingAuth}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 focus:outline-none dark:text-gray-400"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPasswordConfirm ? 'text' : 'password'}
-                id="confirmPassword"
-                className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-gray-900 transition duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-50"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setConfirmPassword(e.target.value)
-                }
-                required
-                disabled={isSubmitting || loadingAuth}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPasswordConfirm((prev) => !prev)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 focus:outline-none dark:text-gray-400"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPasswordConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-          </div>
-          {formAuthError && (
-            <p className="rounded-md bg-red-50 p-2 text-center text-sm text-red-600 dark:bg-red-900 dark:text-red-300">
-              {formAuthError}
-            </p>
-          )}
+          <p className="-mt-5 text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Create your account
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-8 shadow-2xl backdrop-blur-sm">
+          {/* Google OAuth — calls /api/auth/google/ */}
           <button
-            type="submit"
-            className="w-full transform rounded-lg bg-indigo-600 py-3 text-lg font-semibold text-white transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-400"
-            disabled={isSubmitting || loadingAuth}
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={isLoading}
+            className="mb-6 flex w-full items-center justify-center gap-3 rounded-lg border border-white/[0.10] bg-white/[0.05] py-3 text-sm font-medium text-zinc-200 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.09] focus:outline-none focus:ring-2 focus:ring-white/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {isSubmitting || loadingAuth ? 'Processing...' : 'Sign Up'}
+            {isGoogleLoading ? <Spinner /> : <GoogleIcon />}
+            <span>Continue with Google</span>
           </button>
-        </form>
-        <p className="mt-6 text-center text-gray-600 dark:text-gray-300">
-          {'Already have an account?'}{' '}
+
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/[0.07]" />
+            <span className="text-[10px] uppercase tracking-widest text-zinc-600">
+              or
+            </span>
+            <div className="h-px flex-1 bg-white/[0.07]" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="email"
+                className={`block text-[11px] uppercase tracking-widest transition-colors ${focused === 'email' ? 'text-indigo-400' : 'text-zinc-500'}`}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-all focus:border-indigo-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
+                onFocus={() => setFocused('email')}
+                onBlur={() => setFocused(null)}
+                required
+                disabled={isLoading}
+                autoComplete="email"
+              />
+              {email.includes('@') && (
+                <p className="text-[10px] tracking-wider text-zinc-600">
+                  Username:{' '}
+                  <span className="text-zinc-400">{email.split('@')[0]}</span>
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="password"
+                className={`block text-[11px] uppercase tracking-widest transition-colors ${focused === 'password' ? 'text-indigo-400' : 'text-zinc-500'}`}
+              >
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 pr-11 text-sm text-white placeholder-zinc-600 outline-none transition-all focus:border-indigo-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setPassword(e.target.value)
+                  }
+                  onFocus={() => setFocused('password')}
+                  onBlur={() => setFocused(null)}
+                  required
+                  disabled={isLoading}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-zinc-600 transition-colors hover:text-zinc-400"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label
+                htmlFor="confirmPassword"
+                className={`block text-[11px] uppercase tracking-widest transition-colors ${focused === 'confirm' ? 'text-indigo-400' : 'text-zinc-500'}`}
+              >
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  id="confirmPassword"
+                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 pr-11 text-sm text-white placeholder-zinc-600 outline-none transition-all focus:border-indigo-500/60 focus:bg-white/[0.06] focus:ring-1 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setConfirmPassword(e.target.value)
+                  }
+                  onFocus={() => setFocused('confirm')}
+                  onBlur={() => setFocused(null)}
+                  required
+                  disabled={isLoading}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((p) => !p)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-zinc-600 transition-colors hover:text-zinc-400"
+                  tabIndex={-1}
+                >
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Live password checklist */}
+            {password.length > 0 && (
+              <div className="space-y-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+                {checks.map((check) => (
+                  <div key={check.label} className="flex items-center gap-2">
+                    <div
+                      className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full transition-colors ${check.pass ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/[0.05] text-zinc-600'}`}
+                    >
+                      <Check size={10} strokeWidth={3} />
+                    </div>
+                    <span
+                      className={`text-[11px] transition-colors ${check.pass ? 'text-emerald-400' : 'text-zinc-600'}`}
+                    >
+                      {check.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {formAuthError && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3">
+                <p className="text-center text-xs text-red-400">
+                  {formAuthError}
+                </p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading || (password.length > 0 && !allChecksPassed)}
+              className="mt-2 w-full rounded-lg bg-indigo-600 py-3 text-sm font-semibold tracking-wider text-white transition-all hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0a0a0f] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSubmitting || loadingAuth ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner /> CREATING ACCOUNT...
+                </span>
+              ) : (
+                'CREATE ACCOUNT'
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-zinc-600">
+          Already have an account?{' '}
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="font-medium text-indigo-600 transition-colors hover:text-indigo-800 focus:outline-none dark:text-indigo-400 dark:hover:text-indigo-600"
-            disabled={isSubmitting || loadingAuth}
+            className="text-indigo-400 transition-colors hover:text-indigo-300"
+            disabled={isLoading}
           >
-            Login
+            Sign in
           </button>
         </p>
       </div>

@@ -7,11 +7,12 @@ import {
   type KeyboardEvent,
 } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Send } from 'lucide-react';
+import { PageHeader } from './DashboardComponents';
 
 interface MessagePart {
   text: string;
 }
-
 interface Message {
   role: 'user' | 'model';
   parts: MessagePart[];
@@ -19,18 +20,13 @@ interface Message {
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
-
   const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
+  const getAuthToken = () => localStorage.getItem('access_token');
 
-  const getAuthToken = (): string | null => {
-    return localStorage.getItem('access_token');
-  };
-
-  // fetch history on component mount
   useEffect(() => {
     const fetchHistory = async () => {
       setIsLoading(true);
@@ -45,52 +41,37 @@ const Chatbot = () => {
         setIsLoading(false);
         return;
       }
-
       try {
-        const response = await fetch(`${DJANGO_API_BASE_URL}ai/chat_history/`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+        const res = await fetch(`${DJANGO_API_BASE_URL}ai/chat_history/`, {
+          headers: { Authorization: `Bearer ${authToken}` },
         });
-
-        if (response.ok) {
-          const history = await response.json();
-          setMessages(history);
-        } else {
-          console.error('Failed to fetch chat history.');
-        }
-      } catch (error) {
-        console.error('Error fetching chat history:', error);
+        if (res.ok) setMessages(await res.json());
+      } catch (err) {
+        console.error('Error fetching chat history:', err);
       } finally {
         setIsLoading(false);
         setHasLoaded(true);
       }
     };
-
-    if (!hasLoaded) {
-      fetchHistory();
-    }
+    if (!hasLoaded) fetchHistory();
   }, [hasLoaded, DJANGO_API_BASE_URL]);
 
-  // Auto scroll whenever messages or loading state changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
   const handleSendMessage = async () => {
-    if (input.trim() === '') return;
-
+    if (!input.trim()) return;
     const userMessage: Message = { role: 'user', parts: [{ text: input }] };
     const newMessages = [...messages, userMessage];
-
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
     const authToken = getAuthToken();
     if (!authToken) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      setMessages((prev) => [
+        ...prev,
         {
           role: 'model',
           parts: [{ text: 'Please log in to use the chatbot.' }],
@@ -101,7 +82,7 @@ const Chatbot = () => {
     }
 
     try {
-      const response = await fetch(`${DJANGO_API_BASE_URL}ai/chatbot/`, {
+      const res = await fetch(`${DJANGO_API_BASE_URL}ai/chatbot/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,27 +90,19 @@ const Chatbot = () => {
         },
         body: JSON.stringify({ chat_history: newMessages }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail);
-      }
-
-      const result = await response.json();
-      const botResponse: string = result.bot_reply;
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { role: 'model', parts: [{ text: botResponse }] },
+      if (!res.ok) throw new Error((await res.json()).detail);
+      const result = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        { role: 'model', parts: [{ text: result.bot_reply }] },
       ]);
-    } catch (error: any) {
-      console.error('Error communicating with chatbot backend:', error);
-      const errorMessage =
-        error.message || 'An unexpected error occurred. Please try again.';
-
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        { role: 'model', parts: [{ text: errorMessage }] },
+    } catch (err: any) {
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
+        {
+          role: 'model',
+          parts: [{ text: err.message || 'An unexpected error occurred.' }],
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -138,71 +111,92 @@ const Chatbot = () => {
 
   return (
     <div>
-      <h2 className="mb-6 text-3xl font-bold text-gray-900">EduWaka Chatbot</h2>
-      <p className="mb-4 text-gray-700">
-        Ask me questions like "Can I study Medicine with these subjects?" or
-        "What are the requirements for Computer Science at UNILAG?".
-      </p>
-      <div className="flex h-[63vh] flex-col rounded-lg border border-gray-200 bg-gray-50 p-4 sm:h-96">
-        <div className="custom-scrollbar mb-4 flex-1 space-y-3 overflow-y-auto p-2">
+      <PageHeader
+        title="EduWaka Chatbot"
+        subtitle='Ask anything — "Can I study Medicine with these subjects?" or "Requirements for Computer Science at UNILAG?"'
+        badge="AI"
+        badgeVariant="indigo"
+      />
+
+      <div className="flex h-[65vh] flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+        {/* Messages */}
+        <div className="custom-scrollbar flex-1 space-y-4 overflow-y-auto p-5">
           {messages.length === 0 && (
-            <div className="mt-10 text-center text-gray-500">
-              Type a message to start chatting!
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4853ea]/10 text-2xl">
+                🤖
+              </div>
+              <p className="text-sm text-[#9ca3af]">
+                Type a message to start chatting!
+              </p>
             </div>
           )}
-          {messages.map((msg, index: number) => (
+
+          {messages.map((msg, index) => (
             <div
               key={index}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs rounded-lg p-3 shadow-sm ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
                   msg.role === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                    ? 'rounded-br-sm bg-[#00252e] text-white'
+                    : 'rounded-bl-sm border border-[#e5e7eb] bg-[#f9fafb] text-[#111827]'
                 }`}
               >
                 {msg.role === 'user' ? (
-                  <p>{msg.parts.map((part) => part.text).join('')}</p>
+                  <p>{msg.parts.map((p) => p.text).join('')}</p>
                 ) : (
-                  <ReactMarkdown>
-                    {msg.parts.map((part) => part.text).join('')}
-                  </ReactMarkdown>
+                  <div className="prose prose-sm prose-p:my-1 prose-ul:my-1 max-w-none">
+                    <ReactMarkdown>
+                      {msg.parts.map((p) => p.text).join('')}
+                    </ReactMarkdown>
+                  </div>
                 )}
               </div>
             </div>
           ))}
+
           {isLoading && (
             <div className="flex justify-start">
-              <div className="max-w-xs rounded-lg bg-gray-200 p-3 text-gray-800 shadow-sm">
-                <span className="animate-pulse">Typing...</span>
+              <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-sm border border-[#e5e7eb] bg-[#f9fafb] px-4 py-3">
+                {[0, 150, 300].map((delay) => (
+                  <span
+                    key={delay}
+                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#9ca3af]"
+                    style={{ animationDelay: `${delay}ms` }}
+                  />
+                ))}
               </div>
             </div>
           )}
-          {/* 👇 Dummy div for auto-scroll */}
           <div ref={bottomRef} />
         </div>
-        <div className="flex">
-          <input
-            type="text"
-            className="flex-1 rounded-l-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-            placeholder="Type your question..."
-            value={input}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setInput(e.target.value)
-            }
-            onKeyUp={(e: KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === 'Enter') handleSendMessage();
-            }}
-            disabled={isLoading}
-          />
-          <button
-            className="rounded-r-lg bg-blue-600 px-5 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleSendMessage}
-            disabled={isLoading}
-          >
-            Send
-          </button>
+
+        {/* Input bar */}
+        <div className="border-t border-[#e5e7eb] p-4">
+          <div className="flex items-center gap-2 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 py-2 transition-all focus-within:border-[#eb4799] focus-within:ring-2 focus-within:ring-[#eb4799]/20">
+            <input
+              type="text"
+              className="flex-1 bg-transparent text-sm text-[#111827] placeholder-[#9ca3af] outline-none"
+              placeholder="Type your question..."
+              value={input}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setInput(e.target.value)
+              }
+              onKeyUp={(e: KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === 'Enter') handleSendMessage();
+              }}
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={isLoading || !input.trim()}
+              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#eb4799] text-white transition-all hover:bg-[#d43589] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Send size={14} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

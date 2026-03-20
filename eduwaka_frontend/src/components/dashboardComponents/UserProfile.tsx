@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Button from '../ui/button';
-import { EditIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '../../hooks/useAlert';
+import { Camera, Edit2, X, Check } from 'lucide-react';
+import {
+  PageHeader,
+  Input,
+  PrimaryButton,
+  ErrorMessage,
+} from './DashboardComponents';
 
 interface UserProfileData {
   id: number;
@@ -13,202 +18,160 @@ interface UserProfileData {
   first_name?: string;
   last_name?: string;
   photo?: string;
+  photo_url?: string;
 }
-
-// Skeleton loader component for a user profile
-const ProfileSkeletonLoader = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="flex items-center space-x-4">
-      <div className="h-16 w-16 rounded-full bg-gray-300"></div>
-      <div className="flex-1 space-y-2">
-        <div className="h-4 w-1/4 rounded bg-gray-300"></div>
-        <div className="h-4 w-1/2 rounded bg-gray-300"></div>
-      </div>
-    </div>
-    <div className="h-4 w-3/4 rounded bg-gray-300"></div>
-    <div className="h-4 w-1/2 rounded bg-gray-300"></div>
-    <div className="h-4 w-2/3 rounded bg-gray-300"></div>
-    <div className="h-4 w-1/3 rounded bg-gray-300"></div>
-  </div>
-);
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showAlert } = useAlert();
-
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const [newEmail, setNewEmail] = useState<string>(user?.email || '');
-  const [newFirstName, setNewFirstName] = useState<string>(
-    user?.first_name || '',
-  );
-  const [newLastName, setNewLastName] = useState<string>(user?.last_name || '');
-  const [newPhoto, setNewPhoto] = useState<File | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string>('');
-  const [loadingPhoto, setLoadingPhoto] = useState<boolean>(false);
-  const [loadingMessage, setLoadingMessage] = useState<string>('');
-
   const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
+  const [profile, setProfile] = useState<UserProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const [newEmail, setNewEmail] = useState('');
+  const [newFirstName, setNewFirstName] = useState('');
+  const [newLastName, setNewLastName] = useState('');
+  const [newPhoto, setNewPhoto] = useState<File | null>(null);
+
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      setLoadingMessage('Loading your profile...');
+    const fetchProfile = async () => {
       if (!user) {
         setLoading(false);
-        setStatusMessage('Please login to view or edit your profile details.');
-        setLoadingMessage('');
         return;
       }
-
-      const accessToken = localStorage.getItem('access_token');
-      if (!accessToken) {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
         setLoading(false);
-        setStatusMessage('Authentication token missing. Please log in again.');
-        setLoadingMessage('');
         return;
       }
-
       try {
-        const response = await fetch(`${DJANGO_API_BASE_URL}profile/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
+        const res = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch user profile.');
-        }
-
-        const data = await response.json();
-
+        if (!res.ok) throw new Error('Failed to fetch profile.');
+        const data = await res.json();
         setProfile(data);
-      } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        setStatusMessage(error.message || 'Failed to load profile data.');
+        setNewEmail(data.email ?? '');
+        setNewFirstName(data.first_name ?? '');
+        setNewLastName(data.last_name ?? '');
+      } catch (err: any) {
+        setError(err.message);
       } finally {
         setLoading(false);
-        setLoadingMessage('');
       }
     };
-
-    fetchUserProfile();
+    fetchProfile();
   }, [user, DJANGO_API_BASE_URL]);
 
-  // handle file select
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewPhoto(e.target.files[0]);
-    }
-  };
-
   const handleUpdateProfile = async () => {
-    if (!user) {
-      setStatusMessage('Please login to view your profile details.');
-      return;
-    }
-
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-      setStatusMessage('Authentication token missing. Please log in again.');
-      return;
-    }
-
-    setStatusMessage('');
-    setLoadingMessage('Updating profile...');
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+    setSaving(true);
+    setError('');
     try {
       const formData = new FormData();
       formData.append('email', newEmail);
       formData.append('first_name', newFirstName);
       formData.append('last_name', newLastName);
-      if (newPhoto) {
-        formData.append('photo', newPhoto);
-      }
-
-      const response = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
+      if (newPhoto) formData.append('photo', newPhoto);
+      const res = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile.');
-      }
-
-      const updatedData = await response.json();
-      setProfile(updatedData);
-      setStatusMessage('Profile updated successfully!');
+      if (!res.ok) throw new Error('Failed to update profile.');
+      const updated = await res.json();
+      setProfile(updated);
+      // Sync AuthContext so Header/DashboardHeader reflect changes instantly
+      updateUser({
+        photo_url: updated.photo_url ?? updated.photo,
+        first_name: updated.first_name,
+        last_name: updated.last_name,
+        username: updated.username,
+        email: updated.email,
+      });
       setEditMode(false);
       setNewPhoto(null);
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      setStatusMessage('Failed to update profile: ' + error.message);
+      showAlert('success', 'Profile updated successfully!');
+    } catch (err: any) {
+      setError(err.message);
     } finally {
-      setLoadingMessage('');
+      setSaving(false);
     }
   };
 
-  // handle photo upload
   const handlePhotoUpload = async (file: File) => {
-    const accessToken = localStorage.getItem('access_token');
-    if (!accessToken) {
-      setStatusMessage('Authentication token missing. Please log in again.');
-      return;
-    }
-
-    setLoadingPhoto(true);
-    setStatusMessage('Uploading photo...');
-    setLoadingMessage('Uploading photo...');
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+    setPhotoLoading(true);
     try {
       const formData = new FormData();
       formData.append('photo', file);
-
-      const response = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
+      const res = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to upload photo.');
-      }
-
-      const updatedData = await response.json();
-      console.log(updatedData);
-      setProfile(updatedData);
-      setStatusMessage('Photo updated successfully!');
-      showAlert('success', 'Photo uploaded successfully 🎉');
-    } catch (err: any) {
-      console.error('Error uploading photo:', err);
-      setStatusMessage('Failed to upload photo: ' + err.message);
+      if (!res.ok) throw new Error('Upload failed.');
+      const updated = await res.json();
+      setProfile(updated);
+      // Sync AuthContext so Header/DashboardHeader re-render with the new photo instantly
+      updateUser({ photo: updated.photo_url ?? updated.photo });
+      showAlert('success', 'Photo updated successfully 🎉');
+    } catch {
       showAlert('error', 'Failed to upload photo 😟');
     } finally {
-      setLoadingPhoto(false);
-      setLoadingMessage('');
+      setPhotoLoading(false);
     }
   };
 
+  const initials = profile?.first_name
+    ? `${profile.first_name[0]}${profile.last_name?.[0] ?? ''}`.toUpperCase()
+    : (profile?.username?.[0] ?? profile?.email?.[0] ?? 'U').toUpperCase();
+
+  // Loading skeleton
   if (loading) {
     return (
       <div>
-        {loadingMessage && (
-          <div className="mb-4 rounded-lg bg-yellow-100 p-3 text-yellow-800">
-            {loadingMessage}
+        <PageHeader
+          title="My Profile"
+          subtitle="Manage your personal information."
+        />
+        <div className="space-y-4 rounded-2xl border border-[#e5e7eb] bg-white p-6">
+          <div className="flex items-center gap-4">
+            <div className="h-20 w-20 animate-pulse rounded-full bg-[#f3f4f6]" />
+            <div className="space-y-2">
+              <div className="h-4 w-32 animate-pulse rounded-lg bg-[#f3f4f6]" />
+              <div className="h-3 w-48 animate-pulse rounded-lg bg-[#f3f4f6]" />
+            </div>
           </div>
-        )}
-        <h2 className="mb-6 text-3xl font-bold text-gray-900">My Profile</h2>
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
-          <ProfileSkeletonLoader />
+          <div className="h-3 w-3/4 animate-pulse rounded-lg bg-[#f3f4f6]" />
+          <div className="h-3 w-1/2 animate-pulse rounded-lg bg-[#f3f4f6]" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div>
+        <PageHeader title="My Profile" />
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-8 text-center">
+          <p className="mb-4 text-sm text-[#6b7280]">
+            Please log in to view your profile.
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            className="rounded-xl bg-[#eb4799] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#d43589]"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     );
@@ -216,215 +179,197 @@ const UserProfile = () => {
 
   return (
     <div>
-      {loadingMessage && (
-        <div className="mb-4 rounded-lg bg-yellow-100 p-3 text-yellow-800">
-          {loadingMessage}
+      <PageHeader
+        title="My Profile"
+        subtitle="Manage your personal information and saved data."
+      />
+
+      {error && (
+        <div className="mb-4">
+          <ErrorMessage message={error} />
         </div>
       )}
-      <div className="flex items-center justify-between">
-        <h2 className="mb-6 text-3xl font-bold text-gray-900">My Profile</h2>
-        {!user && (
-          <Button variant="secondary" onClick={() => navigate('/login')}>
-            Login
-          </Button>
-        )}
-      </div>
-      <p className="mb-4 text-gray-700">
-        Manage your personal information and saved data.
-      </p>
-      {profile?.photo && (
-        <Button
-          variant="secondary"
-          className="mb-4"
-          onClick={() => document.getElementById('photoUpload')?.click()}
-          disabled={loadingPhoto}
-        >
-          {loadingPhoto ? 'Uploading...' : 'Upload New Photo'}
-          <input
-            type="file"
-            id="photoUpload"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handlePhotoUpload(file);
-              }
-            }}
-          />
-        </Button>
-      )}
 
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-6">
-        {statusMessage && !user && (
-          <div
-            className={`mb-4 rounded-lg p-3 ${
-              statusMessage.includes('Error')
-                ? 'bg-red-100 text-red-700'
-                : 'bg-green-100 text-green-700'
-            }`}
-          >
-            {statusMessage}
-          </div>
-        )}
-
-        {editMode && user ? (
-          <div className="space-y-4">
-            {/* Upload photo input */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                Profile Photo
-              </label>
-              {profile?.photo && !newPhoto && (
-                <img
-                  src={profile.photo}
-                  alt="Current Profile"
-                  className="mb-2 h-16 w-16 rounded-full object-cover"
+      <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        {/* Avatar row */}
+        <div className="mb-6 flex items-start justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="h-20 w-20 overflow-hidden rounded-full ring-2 ring-[#e5e7eb]">
+                {profile?.photo_url ? (
+                  <img
+                    src={profile.photo_url}
+                    alt={profile.username}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-[#00252e] text-xl font-bold text-white">
+                    {initials}
+                  </div>
+                )}
+              </div>
+              <label className="absolute bottom-0 right-0 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#eb4799] text-white shadow-sm transition-colors hover:bg-[#d43589]">
+                {photoLoading ? (
+                  <svg
+                    className="h-3 w-3 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  <Camera size={12} />
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handlePhotoUpload(f);
+                  }}
                 />
-              )}
-              {newPhoto && (
-                <p className="mb-2 text-sm text-gray-600">
-                  Selected: {newPhoto.name}
-                </p>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="w-full text-sm"
-              />
+              </label>
             </div>
+            <div>
+              <p className="text-lg font-bold text-[#111827]">
+                {profile?.first_name
+                  ? `${profile.first_name} ${profile.last_name ?? ''}`.trim()
+                  : profile?.username}
+              </p>
+              <p className="text-sm text-[#6b7280]">@{profile?.username}</p>
+            </div>
+          </div>
 
-            <div>
-              <label
-                htmlFor="profileEmail"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="profileEmail"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-                value={newEmail}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setNewEmail(e.target.value)
-                }
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="profileFirstName"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                First Name
-              </label>
-              <input
-                type="text"
-                id="profileFirstName"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+          {!editMode && (
+            <button
+              onClick={() => setEditMode(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-[#e5e7eb] px-3 py-2 text-xs font-semibold text-[#374151] transition-colors hover:border-[#eb4799] hover:text-[#eb4799]"
+            >
+              <Edit2 size={13} /> Edit
+            </button>
+          )}
+        </div>
+
+        {editMode ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                id="firstName"
+                label="First Name"
                 value={newFirstName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setNewFirstName(e.target.value)
                 }
+                placeholder="First name"
               />
-            </div>
-            <div>
-              <label
-                htmlFor="profileLastName"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Last Name
-              </label>
-              <input
-                type="text"
-                id="profileLastName"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+              <Input
+                id="lastName"
+                label="Last Name"
                 value={newLastName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setNewLastName(e.target.value)
                 }
+                placeholder="Last name"
               />
             </div>
-            <div className="flex space-x-3">
-              <button
+            <Input
+              id="email"
+              label="Email Address"
+              type="email"
+              value={newEmail}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setNewEmail(e.target.value)
+              }
+              placeholder="you@example.com"
+            />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium text-[#374151]">
+                Profile Photo
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="text-sm text-[#374151]"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) setNewPhoto(f);
+                }}
+              />
+              {newPhoto && (
+                <p className="text-xs text-[#6b7280]">
+                  Selected: {newPhoto.name}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2 pt-1">
+              <PrimaryButton
+                loading={saving}
+                loadingText="Saving..."
                 onClick={handleUpdateProfile}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
-                disabled={loading || loadingPhoto}
               >
-                {loading || loadingPhoto ? 'Saving...' : 'Save Changes'}
-              </button>
+                <Check size={15} /> Save Changes
+              </PrimaryButton>
               <button
-                onClick={() => setEditMode(false)}
-                className="rounded-lg bg-gray-300 px-4 py-2 text-gray-800 transition-colors hover:bg-gray-400"
-                disabled={loading || loadingPhoto}
+                onClick={() => {
+                  setEditMode(false);
+                  setNewPhoto(null);
+                }}
+                className="flex items-center gap-1.5 rounded-xl border border-[#e5e7eb] px-4 py-2.5 text-sm font-semibold text-[#374151] transition-colors hover:bg-[#f3f4f6]"
               >
-                Cancel
+                <X size={15} /> Cancel
               </button>
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            <img
-              src={profile?.photo}
-              alt={profile?.username}
-              className="h-28 w-28 rounded-full"
-            />
-            <div className="flex justify-between">
-              <p className="text-gray-700">
-                <span className="font-medium">Username:</span>{' '}
-                {profile?.username || 'N/A'}
-              </p>
+          <div className="space-y-1 border-t border-[#f3f4f6] pt-5">
+            {[
+              { label: 'Email', value: profile?.email },
+              { label: 'Username', value: profile?.username },
+              {
+                label: 'User ID',
+                value: String(profile?.id ?? 'N/A'),
+                mono: true,
+              },
+            ].map((row) => (
               <div
-                className="group relative inline-block"
-                onClick={() => setEditMode(true)}
+                key={row.label}
+                className="flex items-center justify-between rounded-xl px-2 py-3 transition-colors hover:bg-[#f9fafb]"
               >
-                <Button variant="ghost" className="cursor-pointer">
-                  <EditIcon size={20} />
-                </Button>
-                <div className="absolute bottom-full left-1/2 z-10 mb-2 w-max -translate-x-1/2 scale-0 transform rounded bg-gray-800 px-2 py-1 text-sm text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                  Edit Profile
-                </div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#9ca3af]">
+                  {row.label}
+                </span>
+                <span
+                  className={`text-sm text-[#111827] ${row.mono ? 'font-mono text-xs' : ''}`}
+                >
+                  {row.value ?? 'N/A'}
+                </span>
               </div>
-            </div>
-            <p className="text-gray-700">
-              <span className="font-medium">Email:</span>{' '}
-              {profile?.email || 'N/A'}
-            </p>
-            {profile?.first_name && (
-              <p className="text-gray-700">
-                <span className="font-medium">First Name:</span>{' '}
-                {profile.first_name}
-              </p>
-            )}
-            {profile?.last_name && (
-              <p className="text-gray-700">
-                <span className="font-medium">Last Name:</span>{' '}
-                {profile.last_name}
-              </p>
-            )}
-
-            <p className="text-gray-700">
-              <span className="font-medium">Your User ID:</span>{' '}
-              <span className="break-all font-mono text-sm">
-                {profile?.id || 'N/A'}
-              </span>
-            </p>
+            ))}
           </div>
         )}
       </div>
 
-      <div className="mt-8">
-        <h3 className="mb-4 text-xl font-semibold text-gray-900">Saved Data</h3>
-        <p className="text-gray-700">
-          This section will display your saved institutions, courses, and other
-          personalized data.
+      {/* Saved data */}
+      <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
+          Saved Data
         </p>
-        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <p className="italic text-gray-600">
-            No saved items yet. Start exploring to save your preferences!
-          </p>
-        </div>
+        <p className="text-sm italic text-[#9ca3af]">
+          No saved items yet. Start exploring to save your preferences!
+        </p>
       </div>
     </div>
   );

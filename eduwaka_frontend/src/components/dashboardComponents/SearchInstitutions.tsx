@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type ChangeEvent } from 'react';
+import { Search, ExternalLink, MapPin, Building2 } from 'lucide-react';
+import { PageHeader, ErrorMessage } from './DashboardComponents';
 
 export interface Institution {
   id: string;
@@ -9,7 +11,6 @@ export interface Institution {
   year_of_establishment: string;
   website: string;
 }
-
 export interface InstitutionResponse {
   results: Institution[];
   count: number;
@@ -20,36 +21,26 @@ export interface InstitutionResponse {
 const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
 const SearchInstitutions = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedInstitution, setSelectedInstitution] =
-    useState<Institution | null>(null);
+  const [selected, setSelected] = useState<Institution | null>(null);
 
-  // Fetch institutions whenever searchTerm changes
   useEffect(() => {
-    const fetchInstitutions = async () => {
-      if (searchTerm.trim() === '') {
+    const fetch_ = async () => {
+      if (!searchTerm.trim()) {
         setInstitutions([]);
         return;
       }
-
       setIsLoading(true);
       setError(null);
       try {
-        // backend should support query param like ?search=term
-        const response = await fetch(
-          `${DJANGO_API_BASE_URL}institutions/?search=${encodeURIComponent(
-            searchTerm,
-          )}`,
+        const res = await fetch(
+          `${DJANGO_API_BASE_URL}institutions/?search=${encodeURIComponent(searchTerm)}`,
         );
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
-        const data: InstitutionResponse = await response.json();
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        const data: InstitutionResponse = await res.json();
         setInstitutions(data.results);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch institutions');
@@ -57,105 +48,142 @@ const SearchInstitutions = () => {
         setIsLoading(false);
       }
     };
-
-    // debounce: only fetch when user stops typing for ~400ms
-    const timeoutId = setTimeout(fetchInstitutions, 400);
-    return () => clearTimeout(timeoutId);
+    const t = setTimeout(fetch_, 400);
+    return () => clearTimeout(t);
   }, [searchTerm]);
 
-  // fetch single institution details
-  const handleSelectInstitution = async (id: string) => {
+  const handleSelect = async (id: string) => {
     const res = await fetch(`${DJANGO_API_BASE_URL}institutions/${id}/`);
     const data: Institution = await res.json();
-    setSelectedInstitution(data);
+    setSelected(data);
   };
 
   return (
     <div>
-      <h2 className="mb-6 text-3xl font-bold text-gray-900">
-        Search for Institutions
-      </h2>
-      <p className="text-gray-700">
-        Search for universities, polytechnics and colleges of education in
-        Nigeria.
-      </p>
+      <PageHeader
+        title="Search Institutions"
+        subtitle="Find universities, polytechnics and colleges of education in Nigeria."
+      />
 
-      <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-        {/* Search input */}
+      {/* Search */}
+      <div className="relative mb-6">
+        <Search
+          size={15}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9ca3af]"
+        />
         <input
           type="text"
           placeholder="e.g., University of Ibadan, Lagos State University"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+          className="w-full rounded-xl border border-[#e5e7eb] bg-white py-3 pl-10 pr-4 text-sm text-[#111827] placeholder-[#9ca3af] transition-all focus:border-[#eb4799] focus:outline-none focus:ring-2 focus:ring-[#eb4799]/20"
           value={searchTerm}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setSearchTerm(e.target.value)
-          }
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setSearchTerm(e.target.value);
+            setSelected(null);
+          }}
         />
+      </div>
 
-        {/* Loading & errors */}
-        {isLoading && (
-          <p className="mt-4 text-center text-gray-600">
-            Loading institutions...
+      {error && (
+        <div className="mb-4">
+          <ErrorMessage message={error} />
+        </div>
+      )}
+
+      {/* Results list */}
+      {!selected && institutions.length > 0 && (
+        <div className="space-y-2">
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
+            {institutions.length} result{institutions.length !== 1 ? 's' : ''}
           </p>
-        )}
-        {error && <p className="mt-4 text-center text-red-600">{error}</p>}
+          {institutions.map((inst) => (
+            <button
+              key={inst.id}
+              onClick={() => handleSelect(inst.id)}
+              className="group flex w-full items-center justify-between rounded-xl border border-[#e5e7eb] bg-white px-5 py-4 text-left transition-all hover:border-[#eb4799]/30 hover:bg-[#fdf4f9] hover:shadow-sm"
+            >
+              <div>
+                <p className="text-sm font-semibold text-[#111827] group-hover:text-[#eb4799]">
+                  {inst.name}
+                </p>
+                <p className="mt-0.5 text-xs text-[#6b7280]">
+                  {inst.ownership_type} · {inst.state}
+                </p>
+              </div>
+              <Building2
+                size={15}
+                className="flex-shrink-0 text-[#d1d5db] group-hover:text-[#eb4799]"
+              />
+            </button>
+          ))}
+        </div>
+      )}
 
-        {/* Search results */}
-        {institutions.length > 0 && (
-          <div className="mt-4 border-t border-gray-200 pt-4">
-            <h3 className="mb-3 text-lg font-semibold text-gray-800">
-              Search Results:
-            </h3>
-            <ul className="space-y-2">
-              {institutions.map((inst) => (
-                <li
-                  key={inst.id}
-                  onClick={() => handleSelectInstitution(inst.id)} // 👈 add this
-                  className="cursor-pointer rounded-lg bg-white p-3 shadow-sm transition-colors hover:bg-gray-100"
-                >
-                  <p className="font-medium text-gray-900">{inst.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {inst.ownership_type} | {inst.state}
-                  </p>
-                </li>
-              ))}
-            </ul>
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <svg
+            className="h-6 w-6 animate-spin text-[#eb4799]"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+        </div>
+      )}
+
+      {searchTerm.trim() && !institutions.length && !isLoading && (
+        <p className="py-8 text-center text-sm text-[#9ca3af]">
+          No institutions found matching "{searchTerm}".
+        </p>
+      )}
+
+      {/* Detail card */}
+      {selected && (
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+          <button
+            onClick={() => setSelected(null)}
+            className="mb-4 text-xs font-bold text-[#eb4799] transition-colors hover:text-[#d43589]"
+          >
+            ← Back to results
+          </button>
+          <h3 className="mb-1 text-xl font-extrabold text-[#111827]">
+            {selected.name}
+          </h3>
+          <p className="mb-5 text-sm text-[#6b7280]">
+            {selected.ownership_type} Institution
+          </p>
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-2 text-sm text-[#374151]">
+              <MapPin size={14} className="text-[#4853ea]" /> {selected.state}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-[#374151]">
+              <Building2 size={14} className="text-[#4853ea]" /> Established{' '}
+              {selected.year_of_establishment}
+            </div>
           </div>
-        )}
-
-        {/* No results */}
-        {searchTerm.trim() !== '' &&
-          institutions.length === 0 &&
-          !isLoading && (
-            <p className="mt-4 text-center text-gray-600">
-              No institutions found matching "{searchTerm}".
-            </p>
-          )}
-
-        {/* Institution details 👇 */}
-        {selectedInstitution && (
-          <div className="mt-6 rounded-lg border bg-white p-4 shadow">
-            <h3 className="text-xl font-semibold text-gray-900">
-              {selectedInstitution.name}
-            </h3>
-            <p className="text-gray-700">{selectedInstitution.state}</p>
-            <p className="text-gray-700">
-              {selectedInstitution.ownership_type} University
-            </p>
-            <p className="text-gray-700">
-              Established: {selectedInstitution.year_of_establishment}
-            </p>
+          {selected.website && (
             <a
-              href={selectedInstitution.website}
+              href={selected.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-block text-blue-600 hover:underline"
+              className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-[#00252e] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#003a47]"
             >
-              Visit Website
+              <ExternalLink size={13} /> Visit Website
             </a>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

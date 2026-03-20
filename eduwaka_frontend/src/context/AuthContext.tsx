@@ -7,10 +7,8 @@ import {
   type ReactNode,
 } from 'react';
 
-// Base URL for Django eduwaka_backend API
 const DJANGO_API_BASE_URL = import.meta.env.VITE_DJANGO_API_BASE_URL;
 
-// Shape of the Django User object
 interface DjangoUser {
   id: number;
   email: string;
@@ -18,25 +16,24 @@ interface DjangoUser {
   first_name?: string;
   last_name?: string;
   photo?: string;
+  photo_url?: string;
 }
 
-// Shape of the AuthContext value
 interface AuthContextType {
   user: DjangoUser | null;
   token: string | null;
   loadingAuth: boolean;
   appError: string;
+  updateUser: (updates: Partial<DjangoUser>) => void;
   handleSignup: (
-    username: string,
     email: string,
     password: string,
-    firstName: string,
-    lastName: string,
   ) => Promise<{ success: boolean; error?: string }>;
   handleLogin: (
-    username: string,
+    email: string,
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
+  handleGoogleLogin: () => Promise<{ success: boolean; error?: string }>;
   handleLogout: () => Promise<{ success: boolean; error?: string }>;
   handleForgotPassword: (
     email: string,
@@ -59,9 +56,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<DjangoUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [appError, setAppError] = useState<string>('');
 
-  // Function to decode JWT token to get user info
   const decodeJwt = (token: string): any => {
     try {
       const base64Url = token.split('.')[1];
@@ -69,9 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
-          .map(function (c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-          })
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
           .join(''),
       );
       return JSON.parse(jsonPayload);
@@ -81,10 +76,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  // Function to fetch the full user profile from eduwaka_backend
+  const updateUser = (updates: Partial<DjangoUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  };
+
   const fetchUserProfile = async (accessToken: string) => {
     try {
-      const response = await fetch(`${DJANGO_API_BASE_URL}profile/`, {
+      const response = await fetch(`${DJANGO_API_BASE_URL}profile/me/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -94,20 +92,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (response.ok) {
         const userData = await response.json();
-        if (userData.results[0]) {
-          setUser(userData.results[0]);
-          // console.log(
-          //   'AuthContext: Full user profile loaded:',
-          //   userData.results[0],
-          // );
-        } else {
-          console.error('User data from backend is missing a username field.');
-          setUser(null);
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-        }
-
-        return userData.results[0];
+        // /profile/me/ returns a single object, not a paginated list
+        setUser(userData);
+        return userData;
       } else {
         console.error('Failed to fetch user profile:', response.statusText);
         setUser(null);
@@ -124,121 +111,173 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  // On mount: restore session from localStorage
   useEffect(() => {
-    // On component mount, check for existing JWT token in localStorage
     const loadUserFromToken = async () => {
       const accessToken = localStorage.getItem('access_token');
       if (accessToken) {
         const decodedToken = decodeJwt(accessToken);
-        setToken(decodedToken);
         if (decodedToken) {
-          // Fetch full user profile using the token
+          setToken(accessToken);
           await fetchUserProfile(accessToken);
         } else {
-          // Token invalid or expired, clear it
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           setUser(null);
-          console.log('AuthContext: Invalid token, user logged out.');
         }
       }
       setLoadingAuth(false);
-      //console.log('AuthContext: Initial auth loading complete.');
     };
 
     loadUserFromToken();
   }, []);
 
-  const handleSignup = async (
-    username: string,
+  const handleLogin = async (
     email: string,
     password: string,
-    firstName: string,
-    lastName: string,
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${DJANGO_API_BASE_URL}auth/login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        const accessToken = data.access;
+        const refreshToken = data.refresh;
+
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshToken);
+        setToken(accessToken);
+
+        // Populate user state immediately after login
+        await fetchUserProfile(accessToken);
+
+        return { success: true };
+      } else {
+        return { success: false, error: data.detail || 'Login failed.' };
+      }
+    } catch {
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const handleSignup = async (
+    email: string,
+    password: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`${DJANGO_API_BASE_URL}register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          first_name: firstName,
-          last_name: lastName,
-        }),
+        body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
 
       if (response.ok) {
-        // After successful registration, immediately try to log in
-        return handleLogin(username, password);
+        // Registration succeeds but returns no tokens — auto-login after
+        return await handleLogin(email, password);
       } else {
-        return {
-          success: false,
-          error:
-            data.email?.[0] ||
-            data.username?.[0] ||
-            data.password?.[0] ||
-            data.detail ||
-            'Signup failed.',
-        };
+        const firstError =
+          data.email?.[0] ||
+          data.password?.[0] ||
+          data.detail ||
+          'Signup failed.';
+        return { success: false, error: firstError };
       }
-    } catch (error: any) {
-      console.error('Signup error:', error);
-      setAppError(error);
-      return {
-        success: false,
-        error: error.message || 'An unexpected error occurred during signup.',
-      };
+    } catch {
+      return { success: false, error: 'Network error. Please try again.' };
     }
   };
 
-  const handleLogin = async (
-    username: string,
-    password: string,
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      // Call Django REST Framework Simple JWT token obtain endpoint
-      const response = await fetch(`${DJANGO_API_BASE_URL}auth/login/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+  const handleGoogleLogin = (): Promise<{
+    success: boolean;
+    error?: string;
+  }> => {
+    return new Promise((resolve) => {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+      if (!clientId) {
+        resolve({ success: false, error: 'Google Client ID not configured.' });
+        return;
+      }
+
+      const google = (window as any).google;
+      if (!google?.accounts?.oauth2) {
+        resolve({
+          success: false,
+          error: 'Google Sign-In failed to load. Please refresh and try again.',
+        });
+        return;
+      }
+
+      const tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'openid email profile',
+        // Called on success AND on error/cancel
+        callback: async (tokenResponse: any) => {
+          // User closed popup or denied — error_subtype is 'access_denied'
+          if (tokenResponse.error) {
+            if (
+              tokenResponse.error === 'access_denied' ||
+              tokenResponse.error === 'popup_closed_by_user'
+            ) {
+              resolve({ success: false, error: '' }); // silent — user just closed it
+            } else {
+              resolve({
+                success: false,
+                error: `Google error: ${tokenResponse.error}`,
+              });
+            }
+            return;
+          }
+
+          try {
+            const response = await fetch(`${DJANGO_API_BASE_URL}auth/google/`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                access_token: tokenResponse.access_token,
+              }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem('access_token', data.access);
+              localStorage.setItem('refresh_token', data.refresh);
+              setToken(data.access);
+              await fetchUserProfile(data.access);
+              resolve({ success: true });
+            } else {
+              resolve({
+                success: false,
+                error:
+                  data.detail ||
+                  data.non_field_errors?.[0] ||
+                  'Google login failed.',
+              });
+            }
+          } catch {
+            resolve({
+              success: false,
+              error: 'Network error. Please try again.',
+            });
+          }
+        },
+        // Called when popup closes without completing — GSI fires this separately
+        error_callback: (err: any) => {
+          if (err.type === 'popup_closed') {
+            resolve({ success: false, error: '' }); // silent
+          } else {
+            resolve({ success: false, error: 'Google sign-in was cancelled.' });
+          }
+        },
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Login successful!', data);
-
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        const decodedToken = decodeJwt(data.access);
-        setToken(decodedToken);
-        if (decodedToken) {
-          // Fetch the full user profile after getting the token
-          await fetchUserProfile(data.access);
-          return { success: true };
-        } else {
-          return {
-            success: false,
-            error: 'Failed to decode user information from token.',
-          };
-        }
-      } else {
-        return {
-          success: false,
-          error: data.detail || 'Login failed. Check your credentials.',
-        };
-      }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      return {
-        success: false,
-        error: error.message || 'An unexpected error occurred during login.',
-      };
-    }
+      tokenClient.requestAccessToken({ prompt: 'select_account' });
+    });
   };
 
   const handleLogout = async (): Promise<{
@@ -246,10 +285,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     error?: string;
   }> => {
     try {
-      // remove tokens
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       setUser(null);
+      setToken(null);
       return { success: true };
     } catch (error: any) {
       console.error('Logout error:', error);
@@ -269,13 +308,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         `${DJANGO_API_BASE_URL}auth/forgot-password/`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         },
       );
-
       const data = await response.json();
       setLoadingAuth(false);
 
@@ -314,9 +350,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         `${DJANGO_API_BASE_URL}auth/reset-password/`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             uidb64,
             token,
@@ -325,14 +359,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }),
         },
       );
-
       const data = await response.json();
       setLoadingAuth(false);
 
       if (response.ok) {
         return {
           success: true,
-          message: data.message || 'Password reset succesfull.',
+          message: data.message || 'Password reset successful.',
         };
       } else {
         return {
@@ -355,8 +388,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     token,
     loadingAuth,
     appError,
+    updateUser,
     handleSignup,
     handleLogin,
+    handleGoogleLogin,
     handleLogout,
     handleForgotPassword,
     handlePasswordReset,

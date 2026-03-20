@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
+from cloudinary.models import CloudinaryField
+
 # Custom User Profile (Extending Django's default User)
 class UserProfileManager(BaseUserManager):
   def create_user(self, username, email, password=None, **extra_fields):
@@ -37,17 +39,27 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
 
-  photo = models.ImageField(
-    upload_to='profile_photos/',
-    blank=True,
-    null=True,
-    default='default.png' 
+  provider = models.CharField(
+    max_length=20,
+    choices=[
+      ('email', 'Email'),
+      ('google', 'Google')
+    ],
+    default='email'
   )
+
+  photo = CloudinaryField(
+        'photo',
+        folder='eduwaka/profile_photos',
+        blank=True,
+        null=True,
+        default='https://res.cloudinary.com/dvbbvnwkq/image/upload/v1754969274/users/ruzhyrxb2r4goi6vkncs.jpg',  
+    )
 
   objects = UserProfileManager()
 
-  USERNAME_FIELD = 'username' 
-  REQUIRED_FIELDS = ['email', 'first_name', 'last_name'] # These fields will be prompted when creating a user
+  USERNAME_FIELD = 'email' 
+  REQUIRED_FIELDS = [] 
 
   # New fields for soft deletion
   is_deleted = models.BooleanField(default=False)
