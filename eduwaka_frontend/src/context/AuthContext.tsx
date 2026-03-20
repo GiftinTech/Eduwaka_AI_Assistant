@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<DjangoUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [appError, setAppError] = useState<string>('');
 
   const decodeJwt = (token: string): any => {
@@ -70,8 +69,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           .join(''),
       );
       return JSON.parse(jsonPayload);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to decode JWT token:', error);
+      setAppError(error);
       return null;
     }
   };
