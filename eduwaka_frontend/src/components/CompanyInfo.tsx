@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  IoCall,
   IoMail,
   IoLogoFacebook,
   IoLogoTwitter,
@@ -63,22 +62,22 @@ const CompanyInformation: React.FC = () => {
           </p>
 
           <ul className="mt-4 space-y-4 text-sm">
-            <li className="flex items-center">
+            {/* <li className="flex items-center">
               <IoCall size={20} />
               <a
                 href="tel:+1-543-123-4567"
                 className="ml-3 hover:text-[hsl(322,100%,66%)]"
               >
-                +234-90-003-566-02
+                +234-91-003-566-02
               </a>
-            </li>
+            </li> */}
             <li className="flex items-center">
               <IoMail size={20} />
               <a
-                href="mailto:example@fylo.com"
+                href="mailto:gift.egbonyi.awase@gmail.com"
                 className="ml-3 hover:text-[hsl(322,100%,66%)]"
               >
-                eduwaka@edu.com
+                gift.egbonyi.awase@gmail.com
               </a>
             </li>
           </ul>

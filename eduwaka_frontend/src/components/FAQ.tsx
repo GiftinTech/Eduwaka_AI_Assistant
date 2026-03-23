@@ -48,7 +48,6 @@ const FAQ = () => {
     },
   ];
 
-  // Handler to toggle the open state of an accordion item
   const handleToggle = (value: string) => {
     setOpenItem(openItem === value ? null : value);
   };
@@ -150,15 +149,22 @@ const FAQ = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="flex w-full items-center justify-between rounded-lg border-b border-input bg-gray-100 text-left transition-colors duration-200 ease-in-out hover:font-bold"
+                    // Added h-auto, py-4, gap-4 to let it expand properly
+                    className="flex h-auto w-full items-center justify-between gap-4 rounded-lg border-b border-input bg-gray-100 py-4 text-left transition-colors duration-200 ease-in-out hover:font-bold"
                     onClick={() => handleToggle(itemValue)}
                     aria-expanded={isOpen}
                     aria-controls={`accordion-content-${index}`}
                   >
-                    <span className="text-gray-700 dark:text-gray-100">
+                    {/* Added flex-1 and whitespace-normal for text wrapping */}
+                    <span className="flex-1 whitespace-normal text-gray-700 dark:text-gray-100">
                       {faq.question}
                     </span>
-                    {isOpen ? <Minus /> : <Plus />}
+                    {/* Added shrink-0 to prevent the icons from resizing or dropping out */}
+                    {isOpen ? (
+                      <Minus className="shrink-0" />
+                    ) : (
+                      <Plus className="shrink-0" />
+                    )}
                   </Button>
 
                   <div
