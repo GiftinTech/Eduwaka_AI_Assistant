@@ -113,6 +113,11 @@ const Signup = () => {
       if (!result.success && result.error) {
         setFormAuthError(result.error);
       }
+      navigate('/dashboard');
+      showAlert(
+        'success',
+        'Welcome to the eduwaka family! We are delighted to have you 😊',
+      );
     } catch {
       setFormAuthError('Google sign-up failed. Please try again.');
     } finally {

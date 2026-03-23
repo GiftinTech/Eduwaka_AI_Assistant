@@ -51,7 +51,7 @@ DEBUG = os.getenv("DEBUG")
 ALLOWED_HOSTS = [
     "eduwaka-ai-assistant-server.onrender.com",
     "eduwaka-ai-assistant.onrender.com", # React frontend's live address
-    "https://eduwaka.onrender.com", # React frontend's live address
+    "eduwaka.onrender.com", # React frontend's live address
     "localhost:5173",
     "127.0.0.1",
 ]
@@ -218,8 +218,14 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'], # For filtering
 }
 
+# For google login
 REST_AUTH = {
-    'TOKEN_MODEL': None
+    'USE_JWT': True,
+    'TOKEN_MODEL': None,
+}
+
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'dj_rest_auth.serializers.JWTSerializer',
 }
 
 # CORS Headers Config

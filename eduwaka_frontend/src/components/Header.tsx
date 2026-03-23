@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, User, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,10 +15,6 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, handleLogout } = useAuth();
   const navigate = useNavigate();
-
-  const initials = user?.first_name
-    ? `${user.first_name[0]}${user.last_name?.[0] ?? ''}`.toUpperCase()
-    : (user?.username?.[0] ?? user?.email?.[0] ?? 'U').toUpperCase();
 
   const close = () => setIsMenuOpen(false);
 
@@ -59,16 +55,14 @@ const Header = () => {
                   onClick={() => navigate('/dashboard')}
                   className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#e5e7eb] transition-all hover:ring-[#eb4799]"
                 >
-                  {user.photo ? (
+                  {user.photo_url ? (
                     <img
-                      src={user.photo}
+                      src={user.photo_url}
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="flex h-full w-full items-center justify-center bg-[#00252e] text-xs font-bold text-white">
-                      {initials}
-                    </span>
+                    <User />
                   )}
                 </button>
                 <button
@@ -131,16 +125,14 @@ const Header = () => {
                     }}
                     className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#e5e7eb]"
                   >
-                    {user.photo ? (
+                    {user.photo_url ? (
                       <img
-                        src={user.photo}
+                        src={user.photo_url}
                         alt="Profile"
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <span className="flex h-full w-full items-center justify-center bg-[#00252e] text-xs font-bold text-white">
-                        {initials}
-                      </span>
+                      <User size={18} />
                     )}
                   </button>
                   <button

@@ -16,6 +16,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db import OperationalError, DatabaseError
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework_simplejwt.tokens import RefreshToken
 import socket
 from django.http import JsonResponse
 from dj_rest_auth.registration.views import SocialLoginView
@@ -26,6 +27,15 @@ User = get_user_model()
 # Google login
 class GoogleLogin(SocialLoginView):
   adapter_class = GoogleOAuth2Adapter
+
+  def get_response(self):
+    # Generate JWT manually
+    refresh = RefreshToken.for_user(self.user)
+
+    return Response({
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+    })
 
 # LoginViewSet
 class LoginViewSet(APIView):

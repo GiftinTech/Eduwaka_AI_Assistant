@@ -86,6 +86,8 @@ const Login = () => {
       if (!result.success && result.error) {
         setFormAuthError(result.error);
       }
+      navigate('/dashboard');
+      showAlert('success', 'Welcome back!');
     } catch {
       setFormAuthError('Google sign-in failed. Please try again.');
     } finally {
