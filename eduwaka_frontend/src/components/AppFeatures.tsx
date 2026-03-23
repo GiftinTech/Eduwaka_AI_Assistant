@@ -21,7 +21,7 @@ const features = [
   },
   {
     icon: BookOpen,
-    link: '/dashboard/searchcourse',
+    link: '/dashboard/searchCourses',
     title: 'Course Search',
     description: 'Discover courses, their requirements, and duration.',
     accent: '#eb4799',

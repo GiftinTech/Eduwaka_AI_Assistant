@@ -13,7 +13,7 @@ const FAQItem = ({
   return (
     <div className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white">
       <button
-        className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-semibold text-[#111827] transition-colors hover:bg-[#f9fafb]"
+        className="flex w-full items-center justify-between px-2 py-4 text-left text-sm font-semibold text-[#111827] transition-colors hover:bg-[#f9fafb]"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span>{question}</span>

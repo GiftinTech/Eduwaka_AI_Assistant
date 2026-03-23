@@ -51,6 +51,7 @@ DEBUG = os.getenv("DEBUG")
 ALLOWED_HOSTS = [
     "eduwaka-ai-assistant-server.onrender.com",
     "eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "https://eduwaka.onrender.com", # React frontend's live address
     "localhost:5173",
     "127.0.0.1",
 ]
@@ -224,6 +225,7 @@ REST_AUTH = {
 # CORS Headers Config
 CORS_ALLOWED_ORIGINS = [
     "https://eduwaka-ai-assistant.onrender.com", # React frontend's live address
+    "https://eduwaka.onrender.com",  # React frontend's live address
     "http://localhost:5173", # React frontend's local address
     "http://127.0.0.1:8000",
 ]
