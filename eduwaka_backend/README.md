@@ -44,7 +44,7 @@ eduwaka_backend/
 1. Clone repo:
 
    ```bash
-   git clone https://github.com/GiftinTech/eduwaka_backend.git
+   git clone https://github.com/GiftySoftDev/eduwaka_backend.git
    cd eduwaka-backend
    ```
 
