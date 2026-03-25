@@ -5,13 +5,13 @@ It provides tools to search institutions, explore courses, check eligibility, es
 
 ---
 
-### **Frontend link**: [https://eduwaka-ai-assistant.onrender.com/](https://eduwaka-ai-assistant.onrender.com/)
+### **Frontend link**: [https://eduwaka.onrender.com/](https://eduwaka.onrender.com/)
 
-[Frontend README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
+[Frontend README](https://github.com/GiftySoftDev/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
 ### **API Server**: [https://eduwaka-ai-assistant-server.onrender.com/api/](https://eduwaka-ai-assistant-server.onrender.com/api/)
 
-[Server README](https://github.com/GiftinTech/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
+[Server README](https://github.com/GiftySoftDev/Eduwaka_AI_Assistant/blob/main/eduwaka_frontend/README.md)
 
 ---
 
@@ -50,7 +50,7 @@ eduwaka/
 ### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/GiftinTech/eduwaka.git
+git clone https://github.com/GiftySoftDev/eduwaka.git
 cd eduwaka
 ```
 
